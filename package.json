@@ -7,7 +7,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test:config": "node test-config.mjs"
+    "test:config": "node test-config.mjs",
+    "db:setup": "node setup-database.mjs",
+    "db:check": "node check-database.mjs",
+    "db:seed": "node seed-database.mjs",
+    "db:reset": "node setup-database.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.6.1",

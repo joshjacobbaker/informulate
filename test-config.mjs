@@ -47,14 +47,35 @@ async function testConfiguration() {
     } else {
       console.log('   ✅ Supabase connection successful!');
       
-      // Test if we can access the database (this will show available tables)
-      const { error: rpcError } = await supabase.rpc('version');
+      // Test database tables
+      const tables = ['questions', 'game_sessions', 'answers', 'question_history'];
       
-      if (rpcError) {
-        console.log(`   ⚠️  Database access test: ${rpcError.message}`);
-        console.log('   💡 This is normal if you haven\'t created any tables yet');
-      } else {
-        console.log('   ✅ Database access confirmed!');
+      for (const table of tables) {
+        try {
+          const { error: tableError } = await supabase.from(table).select('*').limit(1);
+          if (tableError) {
+            console.log(`   ⚠️  Table '${table}': ${tableError.message}`);
+          } else {
+            console.log(`   ✅ Table '${table}': Accessible`);
+          }
+        } catch (tableError) {
+          console.log(`   ❌ Table '${table}': Error checking - ${tableError.message || tableError}`);
+        }
+      }
+      
+      // Test count of sample questions
+      try {
+        const { data: questionCount, error: countError } = await supabase
+          .from('questions')
+          .select('*', { count: 'exact', head: true });
+          
+        if (countError) {
+          console.log(`   ⚠️  Questions count: ${countError.message}`);
+        } else {
+          console.log(`   📊 Questions in database: ${questionCount?.length || 0}`);
+        }
+      } catch (countError) {
+        console.log(`   ⚠️  Could not count questions - ${countError.message || countError}`);
       }
     }
   } catch (error) {
