@@ -8,10 +8,15 @@
     "start": "next start",
     "lint": "next lint",
     "test:config": "node test-config.mjs",
+    "test:api": "node test-api.mjs",
+    "test:openai": "node test-openai.mjs",
+    "test:edge-functions": "node test-edge-functions.mjs",
+    "test:all": "npm run test:config && npm run test:api",
     "db:setup": "node setup-database.mjs",
     "db:check": "node check-database.mjs",
     "db:seed": "node seed-database.mjs",
-    "db:reset": "node setup-database.mjs"
+    "db:reset": "node setup-database.mjs",
+    "db:open": "node open-supabase.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.6.1",
