@@ -13,7 +13,7 @@ async function testConfiguration() {
     'NEXT_PUBLIC_SUPABASE_URL',
     'NEXT_PUBLIC_SUPABASE_ANON_KEY',
     'SUPABASE_SERVICE_ROLE_KEY',
-    'INFORMULATE_OPENAI_API_KEY'
+    'OPENAI_API_KEY'
   ];
 
   let allVarsPresent = true;
@@ -65,7 +65,7 @@ async function testConfiguration() {
   try {
     const response = await fetch('https://api.openai.com/v1/models', {
       headers: {
-        'Authorization': `Bearer ${process.env.INFORMULATE_OPENAI_API_KEY}`,
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
         'Content-Type': 'application/json'
       }
     });
