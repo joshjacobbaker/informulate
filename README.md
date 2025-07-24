@@ -227,7 +227,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - OpenAI for providing the AI capabilities
 - Supabase for the backend infrastructure
 - Next.js team for the excellent framework
-- Vercel for hosting and deployment
 
 ---
 

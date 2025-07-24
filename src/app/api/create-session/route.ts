@@ -3,14 +3,14 @@ import { createClient } from '@supabase/supabase-js'
 import { ApiErrorHandler, withErrorHandling } from '@/lib/utils/error-handling'
 import type { Database } from '@/lib/supabase/types'
 
-// Initialize Supabase client with service role for server-side operations
-const supabase = createClient<Database>(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
-
 export async function POST(request: NextRequest) {
   return withErrorHandling(async () => {
+    // Initialize Supabase client with service role for server-side operations
+    const supabase = createClient<Database>(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    )
+
     const body = await request.json()
     const { 
       playerId = 'anonymous',

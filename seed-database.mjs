@@ -7,9 +7,13 @@
 
 import { createClient } from '@supabase/supabase-js'
 import dotenv from 'dotenv'
+import { existsSync } from 'fs'
 
-// Load environment variables
-dotenv.config({ path: '.env.local' })
+// Load environment variables from .env.local if it exists (local development)
+// In CI, environment variables are already set, so this is optional
+if (existsSync('.env.local')) {
+  dotenv.config({ path: '.env.local' })
+}
 
 const sampleQuestions = [
   {
