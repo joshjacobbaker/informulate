@@ -8,10 +8,13 @@
 import { createClient } from '@supabase/supabase-js'
 import { join } from 'path'
 import dotenv from 'dotenv'
-import { readFileSync } from 'fs'
+import { readFileSync, existsSync } from 'fs'
 
-// Load environment variables
-dotenv.config({ path: '.env.local' })
+// Load environment variables from .env.local if it exists (local development)
+// In CI, environment variables are already set, so this is optional
+if (existsSync('.env.local')) {
+  dotenv.config({ path: '.env.local' })
+}
 
 async function checkDatabaseSchema() {
   console.log('🔍 Checking AI Trivia Arena Database Schema...\n')

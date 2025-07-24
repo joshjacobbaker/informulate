@@ -1,8 +1,12 @@
 import dotenv from 'dotenv';
 import { createClient } from '@supabase/supabase-js';
+import { existsSync } from 'fs';
 
-// Load environment variables
-dotenv.config({ path: '.env.local' });
+// Load environment variables from .env.local if it exists (local development)
+// In CI, environment variables are already set, so this is optional
+if (existsSync('.env.local')) {
+  dotenv.config({ path: '.env.local' });
+}
 
 async function testConfiguration() {
   console.log('🧪 Testing AI Trivia Arena Configuration...\n');
@@ -20,7 +24,7 @@ async function testConfiguration() {
   requiredVars.forEach(varName => {
     const value = process.env[varName];
     if (value) {
-      console.log(`   ✅ ${varName}: ${value.substring(0, 20)}...`);
+      console.log(`   ✅ ${varName}: Present`);
     } else {
       console.log(`   ❌ ${varName}: Missing`);
       allVarsPresent = false;
@@ -28,11 +32,24 @@ async function testConfiguration() {
   });
 
   if (!allVarsPresent) {
-    console.log('\n❌ Some environment variables are missing. Please check your .env.local file.');
-    process.exit(1);
+    console.log('\n❌ Some environment variables are missing.');
+    
+    // If running in CI without secrets, skip the test gracefully
+    if (process.env.CI === 'true') {
+      console.log('ℹ️  Running in CI environment - integration tests require secrets to be configured.');
+      console.log('⏭️  Skipping integration tests.');
+      return; // Exit gracefully instead of process.exit(1)
+    } else {
+      console.log('Please check your .env.local file.');
+      process.exit(1);
+    }
   }
 
-  console.log('\n2️⃣ Testing Supabase Connection:');
+  console.log('   ✅ All environment variables are present!\n');
+
+  // Test 2: Supabase Connection
+  console.log('2️⃣ Testing Supabase Connection:');
+  
   try {
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -82,7 +99,9 @@ async function testConfiguration() {
     console.log(`   ❌ Supabase connection failed: ${error.message}`);
   }
 
+  // Test 3: OpenAI Connection
   console.log('\n3️⃣ Testing OpenAI Connection:');
+  
   try {
     const response = await fetch('https://api.openai.com/v1/models', {
       headers: {
@@ -93,15 +112,16 @@ async function testConfiguration() {
 
     if (response.ok) {
       console.log('   ✅ OpenAI API connection successful!');
+      const data = await response.json();
+      console.log(`   📊 Available models: ${data.data?.length || 0}`);
     } else {
-      const errorData = await response.text();
-      console.log(`   ❌ OpenAI API Error: ${response.status} - ${errorData}`);
+      console.log(`   ❌ OpenAI API Error: ${response.status} ${response.statusText}`);
     }
   } catch (error) {
     console.log(`   ❌ OpenAI connection failed: ${error.message}`);
   }
 
-  console.log('\n✨ Configuration test complete!');
+  console.log('\n✅ Configuration test completed!');
 }
 
 testConfiguration().catch(console.error);
