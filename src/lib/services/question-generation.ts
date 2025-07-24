@@ -2,12 +2,6 @@ import { createClient } from '@supabase/supabase-js'
 import { openAIService } from '@/lib/openai'
 import type { Database } from '@/lib/supabase/types'
 
-// Initialize Supabase client with service role
-const supabase = createClient<Database>(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
-
 export interface QuestionGenerationRequest {
   sessionId: string
   category?: string
@@ -31,6 +25,16 @@ export interface QuestionGenerationResponse {
 }
 
 export class QuestionGenerationService {
+  
+  /**
+   * Create a Supabase client for server-side operations
+   */
+  private createSupabaseClient() {
+    return createClient<Database>(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    )
+  }
   
   /**
    * Generate a question for a game session
@@ -97,6 +101,8 @@ export class QuestionGenerationService {
     category?: string, 
     difficulty?: 'easy' | 'medium' | 'hard'
   ) {
+    const supabase = this.createSupabaseClient()
+    
     const { data: questions, error } = await supabase
       .rpc('get_random_question', {
         p_session_id: sessionId,
@@ -183,6 +189,8 @@ export class QuestionGenerationService {
    * Get previously asked questions for the session
    */
   private async getPreviousQuestions(sessionId: string): Promise<string[]> {
+    const supabase = this.createSupabaseClient()
+    
     const { data: questionHistory } = await supabase
       .from('question_history')
       .select('questions(question_text)')
@@ -206,6 +214,8 @@ export class QuestionGenerationService {
     difficulty?: 'easy' | 'medium' | 'hard'
   ) {
     try {
+      const supabase = this.createSupabaseClient()
+      
       const { data: savedQuestion, error } = await supabase
         .from('questions')
         .insert({
@@ -248,6 +258,8 @@ export class QuestionGenerationService {
     }
     
     try {
+      const supabase = this.createSupabaseClient()
+      
       const { error } = await supabase
         .from('question_history')
         .insert({

@@ -44,10 +44,12 @@ You need to configure these secrets in your GitHub repository settings:
 
 #### For CI Pipeline:
 ```
-CODECOV_TOKEN          # Optional: Codecov upload token
-SNYK_TOKEN            # Optional: Snyk security scanning
-NEXT_PUBLIC_SUPABASE_URL        # Your Supabase project URL
-NEXT_PUBLIC_SUPABASE_ANON_KEY   # Your Supabase anon key
+CODECOV_TOKEN                   # Optional: Codecov upload token
+SNYK_TOKEN                     # Optional: Snyk security scanning
+NEXT_PUBLIC_SUPABASE_URL       # Your Supabase project URL
+NEXT_PUBLIC_SUPABASE_ANON_KEY  # Your Supabase anon key
+SUPABASE_SERVICE_ROLE_KEY      # Your Supabase service role key
+OPENAI_API_KEY                 # Your OpenAI API key
 ```
 
 ## Environment Setup
