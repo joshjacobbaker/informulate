@@ -189,8 +189,8 @@ testRunner.test('Submit Answer - Success', async () => {
     },
     body: JSON.stringify({
       sessionId: testSessionId,
-      questionId: generatedQuestion.id,
-      selectedAnswer: generatedQuestion.options[0],
+      questionId: generatedQuestion?.id,
+      selectedAnswer: generatedQuestion?.options[0],
       timeTaken: 5000,
       generateExplanation: false
     })
