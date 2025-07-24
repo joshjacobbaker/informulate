@@ -1,11 +1,9 @@
 import React from "react";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import Home from "./page";
-
-// Mock fetch globally
-const mockFetch = jest.fn();
-global.fetch = mockFetch;
+import { renderWithQuery } from "@/jestTestMocks/renderWithQuery";
+import { mockFetch } from "@/jestTestMocks/commonMocks";
 
 // Mock window.alert
 const mockAlert = jest.fn();
@@ -13,6 +11,8 @@ Object.defineProperty(window, "alert", {
   writable: true,
   value: mockAlert,
 });
+
+global.fetch = mockFetch;
 
 // Mock console methods to suppress error logs in tests
 const mockConsoleError = jest
@@ -22,7 +22,6 @@ const mockConsoleLog = jest.spyOn(console, "log").mockImplementation(() => {});
 
 describe("Home page", () => {
   beforeEach(() => {
-    // Clear localStorage before each test
     window.localStorage.clear();
     jest.clearAllMocks();
     mockFetch.mockClear();
@@ -37,7 +36,7 @@ describe("Home page", () => {
   });
 
   it("renders the hero section and CTA buttons", () => {
-    render(<Home />);
+    renderWithQuery(<Home />);
     expect(
       screen.getByRole("heading", { name: "AI Trivia Arena" })
     ).toBeInTheDocument();
@@ -46,7 +45,7 @@ describe("Home page", () => {
   });
 
   it("opens and closes the StartGameModal", () => {
-    render(<Home />);
+    renderWithQuery(<Home />);
     fireEvent.click(screen.getByText(/Start Playing Now/i));
     expect(screen.getByText(/Start New Game/i)).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "" })); // close button (svg)
@@ -54,12 +53,11 @@ describe("Home page", () => {
   });
 
   it("shows default values in StartGameModal", () => {
-    render(<Home />);
+    renderWithQuery(<Home />);
     fireEvent.click(screen.getByText(/Start Playing Now/i));
     expect(screen.getByLabelText(/Player Name/i)).toHaveValue("");
     expect(screen.getByDisplayValue("medium")).toBeChecked();
     fireEvent.click(screen.getByLabelText(/Category/i));
-    // Assert that the dropdown lists "Science & Nature"
     const categoryDropdown = screen.getByLabelText(
       /Category/i
     ) as HTMLSelectElement;
@@ -71,7 +69,7 @@ describe("Home page", () => {
   });
 
   it("allows changing player name, difficulty, and category", () => {
-    render(<Home />);
+    renderWithQuery(<Home />);
     fireEvent.click(screen.getByText(/Start Playing Now/i));
     fireEvent.change(screen.getByLabelText(/Player Name/i), {
       target: { value: "Alice" },
@@ -86,14 +84,13 @@ describe("Home page", () => {
   });
 
   it("submits the form and stores session in localStorage", async () => {
-    // Set up the mock before rendering
     const fakeSession = { session: { id: "abc123", playerId: "Alice" } };
     mockFetch.mockResolvedValueOnce({
       ok: true,
       json: jest.fn().mockResolvedValue(fakeSession),
     });
 
-    render(<Home />);
+    renderWithQuery(<Home />);
     fireEvent.click(screen.getByText(/Start Playing Now/i));
     fireEvent.change(screen.getByLabelText(/Player Name/i), {
       target: { value: "Alice" },
@@ -121,10 +118,9 @@ describe("Home page", () => {
   });
 
   it("handles API error gracefully", async () => {
-    // Set up the mock to simulate a failed response
     mockFetch.mockRejectedValueOnce(new Error("Network error"));
 
-    render(<Home />);
+    renderWithQuery(<Home />);
     fireEvent.click(screen.getByText(/Start Playing Now/i));
     fireEvent.click(screen.getByText(/Start Game/i));
 
@@ -144,9 +140,8 @@ describe("Home page", () => {
       json: jest.fn().mockResolvedValue(fakeSession),
     });
 
-    render(<Home />);
+    renderWithQuery(<Home />);
     fireEvent.click(screen.getByText(/Start Playing Now/i));
-    // Leave player name empty (default value)
     fireEvent.click(screen.getByText(/Start Game/i));
 
     await waitFor(() => {
@@ -164,7 +159,7 @@ describe("Home page", () => {
   });
 
   it("renders features and stats sections", () => {
-    render(<Home />);
+    renderWithQuery(<Home />);
     expect(screen.getByText(/AI-Powered Questions/i)).toBeInTheDocument();
     expect(screen.getByText(/Real-time Gameplay/i)).toBeInTheDocument();
     expect(screen.getByText(/Questions Available/i)).toBeInTheDocument();
@@ -172,7 +167,7 @@ describe("Home page", () => {
   });
 
   it('renders "How It Works" section', () => {
-    render(<Home />);
+    renderWithQuery(<Home />);
     expect(screen.getByText(/How It Works/i)).toBeInTheDocument();
     expect(screen.getByText(/Choose Your Preferences/i)).toBeInTheDocument();
     expect(screen.getByText(/Answer Questions/i)).toBeInTheDocument();
@@ -180,7 +175,7 @@ describe("Home page", () => {
   });
 
   it("renders CTA section and footer", () => {
-    render(<Home />);
+    renderWithQuery(<Home />);
     expect(
       screen.getByRole("heading", { name: /Ready to Test Your Knowledge?/i })
     ).toBeInTheDocument();

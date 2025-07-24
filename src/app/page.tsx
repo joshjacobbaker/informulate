@@ -11,9 +11,11 @@ import Stats from "@/components/Stats/Stats";
 import { statsData } from "@/components/Stats/statsData";
 import CtaButton from "@/components/CtaButton/CtaButton";
 import LogoBrand from "@/components/LogoBrand/LogoBrand";
+import { useCreateGameSession } from "@/lib/query";
 
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const createGameSession = useCreateGameSession();
 
   const handleStartGame = async (
     playerName: string,
@@ -21,35 +23,11 @@ export default function Home() {
     category: string
   ) => {
     try {
-      // Create a new game session
-      const sessionResponse = await fetch("/api/create-session", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          playerId: playerName,
-          difficultyPreference: difficulty,
-          categoryPreference: category || null,
-        }),
+      const sessionData = await createGameSession.mutateAsync({
+        playerId: playerName,
+        difficulty: difficulty as "easy" | "medium" | "hard",
+        category: category || "any",
       });
-
-      if (!sessionResponse.ok) {
-        throw new Error("Failed to create game session");
-      }
-
-      const sessionData = await sessionResponse.json();
-
-      // Store session info in localStorage for the game
-      localStorage.setItem(
-        "gameSession",
-        JSON.stringify({
-          sessionId: sessionData.session.id,
-          playerName: sessionData.session.playerId,
-          difficulty,
-          category,
-        })
-      );
 
       // TODO: Navigate to game page once it's implemented
       console.log("Game session created:", sessionData);
