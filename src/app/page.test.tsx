@@ -38,7 +38,9 @@ describe("Home page", () => {
 
   it("renders the hero section and CTA buttons", () => {
     render(<Home />);
-    expect(screen.getByText(/AI Trivia Arena/i)).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "AI Trivia Arena" })
+    ).toBeInTheDocument();
     expect(screen.getByText(/Start Playing Now/i)).toBeInTheDocument();
     expect(screen.getByText(/View Demo/i)).toBeInTheDocument();
   });
@@ -56,7 +58,16 @@ describe("Home page", () => {
     fireEvent.click(screen.getByText(/Start Playing Now/i));
     expect(screen.getByLabelText(/Player Name/i)).toHaveValue("");
     expect(screen.getByDisplayValue("medium")).toBeChecked();
-    expect(screen.getByDisplayValue("any")).toBeInTheDocument();
+    fireEvent.click(screen.getByLabelText(/Category/i));
+    // Assert that the dropdown lists "Science & Nature"
+    const categoryDropdown = screen.getByLabelText(
+      /Category/i
+    ) as HTMLSelectElement;
+    expect(
+      Array.from(categoryDropdown.options).some(
+        (option) => (option as HTMLOptionElement).text === "Science & Nature"
+      )
+    ).toBe(true);
   });
 
   it("allows changing player name, difficulty, and category", () => {
@@ -171,9 +182,11 @@ describe("Home page", () => {
   it("renders CTA section and footer", () => {
     render(<Home />);
     expect(
-      screen.getByText(/Ready to Test Your Knowledge/i)
+      screen.getByRole("heading", { name: /Ready to Test Your Knowledge?/i })
     ).toBeInTheDocument();
-    expect(screen.getByText(/Get Started Free/i)).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /Get Started Free/i })
+    ).toBeInTheDocument();
     expect(screen.getByText(/Powered by AI/i)).toBeInTheDocument();
     expect(screen.getByText(/All rights reserved/i)).toBeInTheDocument();
   });
