@@ -1,6 +1,5 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { useRouter } from "next/navigation";
 import QuestionCard, { QuestionData } from "./QuestionCard";
 
 const mockQuestion: QuestionData = {
@@ -155,19 +154,17 @@ describe("QuestionCard", () => {
       <QuestionCard {...defaultProps} selectedAnswer="B" isSubmitted={true} />
     );
 
-    // Check that the correct answer (Paris) has a checkmark (green circle with checkmark SVG)
+    // Check that the correct answer (Paris) has a checkmark icon
     const correctButton = screen.getByText("Paris").closest("button");
-    const checkmarkIcon = correctButton?.querySelector(
-      'svg path[d="M5 13l4 4L19 7"]'
-    );
+    const checkmarkIcon = correctButton?.querySelector("svg");
     expect(checkmarkIcon).toBeInTheDocument();
+    expect(correctButton).toHaveClass("border-green-500");
 
-    // Check that the selected incorrect answer (Berlin) has an X mark (red circle with X SVG)
+    // Check that the selected incorrect answer (Berlin) has an X mark icon
     const incorrectButton = screen.getByText("Berlin").closest("button");
-    const xMarkIcon = incorrectButton?.querySelector(
-      'svg path[d="M6 18L18 6M6 6l12 12"]'
-    );
+    const xMarkIcon = incorrectButton?.querySelector("svg");
     expect(xMarkIcon).toBeInTheDocument();
+    expect(incorrectButton).toHaveClass("border-red-500");
   });
 
   it("formats timer correctly for different time values", () => {

@@ -1,6 +1,8 @@
 // Main component exports
 export { default as QuestionCard } from './QuestionCard';
 export { default as GameQuestion } from './GameQuestion';
+export { default as AnswerButton } from './AnswerButton';
+export { default as MultipleChoiceGroup } from './MultipleChoiceGroup';
 export { default as StartGameModal } from './StartGameModal/StartGameModal';
 export { default as Footer } from './Footer/Footer';
 export { default as CallToActionSection } from './CallToActionSection/CallToActionSection';
@@ -12,3 +14,5 @@ export { default as LogoBrand } from './LogoBrand/LogoBrand';
 
 // Type exports
 export type { QuestionData, QuestionCardProps } from './QuestionCard';
+export type { AnswerButtonProps } from './AnswerButton';
+export type { MultipleChoiceGroupProps, MultipleChoiceOption } from './MultipleChoiceGroup';

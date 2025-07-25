@@ -1,5 +1,6 @@
 import React from "react";
 import { Clock, BookOpen, Zap } from "lucide-react";
+import MultipleChoiceGroup, { MultipleChoiceOption } from "../MultipleChoiceGroup";
 
 export interface QuestionData {
   id: string;
@@ -42,38 +43,24 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
     }
   };
 
-  const getOptionLetter = (index: number) => {
-    return String.fromCharCode(65 + index); // A, B, C, D
-  };
-
-  const getOptionButtonClass = (option: string, index: number) => {
-    const baseClass =
-      "w-full text-left p-4 rounded-lg border-2 transition-all duration-200 flex items-center gap-3 min-h-[60px]";
-    const letter = getOptionLetter(index);
-    const isSelected = selectedAnswer === letter;
-    const isCorrect = question.correctAnswer === letter;
-
-    if (isSubmitted || showCorrectAnswer) {
-      if (isCorrect) {
-        return `${baseClass} border-green-500 bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-200`;
-      } else if (isSelected && !isCorrect) {
-        return `${baseClass} border-red-500 bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-200`;
-      } else {
-        return `${baseClass} border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 text-gray-600 dark:text-gray-400`;
-      }
-    }
-
-    if (isSelected) {
-      return `${baseClass} border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-800 dark:text-blue-200 transform scale-[1.02]`;
-    }
-
-    return `${baseClass} border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white hover:border-blue-300 dark:hover:border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/10 transform hover:scale-[1.01]`;
-  };
-
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
+  };
+
+  // Convert question options to MultipleChoiceOption format
+  const convertToMultipleChoiceOptions = (): MultipleChoiceOption[] => {
+    return question.options.map((option, index) => {
+      const letter = String.fromCharCode(65 + index); // A, B, C, D
+      const text = option.replace(/^[A-E]\.\s*/, ""); // Remove letter prefix if it exists
+      
+      return {
+        letter,
+        text,
+        isCorrect: question.correctAnswer === letter,
+      };
+    });
   };
 
   if (isLoading) {
@@ -139,69 +126,18 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
       </div>
 
       {/* Answer Options */}
-      <div className="space-y-3">
-        {question.options.map((option, index) => {
-          const letter = getOptionLetter(index);
-          const optionText = option.replace(/^[A-E]\.\s*/, ""); // Remove letter prefix if it exists
-
-          return (
-            <button
-              key={index}
-              onClick={() => !isSubmitted && onAnswerSelect(letter)}
-              disabled={isSubmitted}
-              className={getOptionButtonClass(option, index)}
-            >
-              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-600 dark:bg-blue-500 text-white font-bold flex items-center justify-center">
-                {letter}
-              </div>
-              <span className="flex-grow text-lg">{optionText}</span>
-
-              {(isSubmitted || showCorrectAnswer) &&
-                question.correctAnswer === letter && (
-                  <div className="flex-shrink-0">
-                    <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center">
-                      <svg
-                        className="w-4 h-4 text-white"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M5 13l4 4L19 7"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                )}
-
-              {(isSubmitted || showCorrectAnswer) &&
-                selectedAnswer === letter &&
-                question.correctAnswer !== letter && (
-                  <div className="flex-shrink-0">
-                    <div className="w-6 h-6 rounded-full bg-red-500 flex items-center justify-center">
-                      <svg
-                        className="w-4 h-4 text-white"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M6 18L18 6M6 6l12 12"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                )}
-            </button>
-          );
-        })}
-      </div>
+      <MultipleChoiceGroup
+        options={convertToMultipleChoiceOptions()}
+        selectedAnswer={selectedAnswer}
+        onAnswerSelect={onAnswerSelect}
+        isSubmitted={isSubmitted}
+        showFeedback={isSubmitted || showCorrectAnswer}
+        disabled={isSubmitted}
+        variant="default"
+        animateOnHover={true}
+        layout="vertical"
+        correctAnswer={question.correctAnswer}
+      />
 
       {/* Instructions */}
       {!isSubmitted && (
