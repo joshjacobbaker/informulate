@@ -1,6 +1,7 @@
-import '@testing-library/jest-dom';
+// jest.setup.js or in your test file
+import { jest } from '@jest/globals';
 
-// Mock Next.js router
+// Mock next/navigation
 jest.mock('next/navigation', () => ({
   useRouter() {
     return {
@@ -14,17 +15,10 @@ jest.mock('next/navigation', () => ({
   },
   useSearchParams() {
     return {
-      get: jest.fn(() => null),
-      getAll: jest.fn(() => []),
-      has: jest.fn(() => false),
+      get: jest.fn(),
     };
   },
   usePathname() {
     return '/';
   },
-  useParams() {
-    return {};
-  },
-  notFound: jest.fn(),
-  redirect: jest.fn(),
 }));
