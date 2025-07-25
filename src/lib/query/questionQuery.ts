@@ -1,5 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
+import { TriviaExplanation } from '@/lib/openai/types';
+
 // Types for question API
 export interface QuestionResponse {
   success: boolean;
@@ -34,7 +36,7 @@ export interface SubmitAnswerResponse {
   isCorrect: boolean;
   correctAnswer: string;
   pointsEarned: number;
-  explanation?: string;
+  explanation?: TriviaExplanation | string; // Can be rich explanation object or simple string
   newScore: number;
   streak: number;
   timestamp: string;

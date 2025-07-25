@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import QuestionCard, { QuestionData } from '../QuestionCard';
+import ExplanationPanel from '../ExplanationPanel';
 import { 
   useGenerateQuestion, 
   useSubmitAnswer, 
@@ -193,32 +194,17 @@ const GameQuestion: React.FC<GameQuestionProps> = ({
 
       {/* Result Display */}
       {showResult && submitAnswerMutation.data && (
-        <div className="mt-6 text-center">
-          <div className={`p-4 rounded-lg ${
-            submitAnswerMutation.data.isCorrect 
-              ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800' 
-              : 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800'
-          }`}>
-            <h3 className={`text-lg font-semibold mb-2 ${
-              submitAnswerMutation.data.isCorrect 
-                ? 'text-green-800 dark:text-green-200' 
-                : 'text-red-800 dark:text-red-200'
-            }`}>
-              {submitAnswerMutation.data.isCorrect ? '🎉 Correct!' : '❌ Incorrect'}
-            </h3>
-            <p className={`text-sm ${
-              submitAnswerMutation.data.isCorrect 
-                ? 'text-green-600 dark:text-green-300' 
-                : 'text-red-600 dark:text-red-300'
-            }`}>
-              Points earned: {submitAnswerMutation.data.pointsEarned} | Total score: {submitAnswerMutation.data.newScore}
-            </p>
-            {submitAnswerMutation.data.explanation && (
-              <p className="text-gray-600 dark:text-gray-300 mt-2 text-sm">
-                {submitAnswerMutation.data.explanation}
-              </p>
-            )}
-          </div>
+        <div className="mt-6">
+          <ExplanationPanel
+            isCorrect={submitAnswerMutation.data.isCorrect}
+            correctAnswer={submitAnswerMutation.data.correctAnswer}
+            userAnswer={selectedAnswer}
+            explanation={submitAnswerMutation.data.explanation}
+            pointsEarned={submitAnswerMutation.data.pointsEarned}
+            variant="default"
+            showScoreInfo={true}
+            animateOnMount={true}
+          />
         </div>
       )}
     </div>
