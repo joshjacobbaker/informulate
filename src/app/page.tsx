@@ -13,6 +13,7 @@ import CtaButton from "@/components/CtaButton/CtaButton";
 import LogoBrand from "@/components/LogoBrand/LogoBrand";
 import { useCreateGameSession } from "@/lib/query";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -32,7 +33,7 @@ export default function Home() {
       });
 
       // Navigate to game page
-      router.push('/game');
+      router.push("/game");
       setIsModalOpen(false);
     } catch (error) {
       console.error("Error starting game:", error);
@@ -85,7 +86,7 @@ export default function Home() {
 
       {/* How it works Section */}
       <HowItWorksSection />
-      
+
       {/* Demo Links Section */}
       <div className="bg-gray-50 dark:bg-gray-800 py-16">
         <div className="max-w-4xl mx-auto px-6 text-center">
@@ -95,9 +96,9 @@ export default function Home() {
           <p className="text-lg text-gray-600 dark:text-gray-300 mb-8">
             Check out our interactive demos to see the AI Trivia Arena in action
           </p>
-          
+
           <div className="grid md:grid-cols-3 gap-6">
-            <a
+            <Link
               href="/demo"
               className="bg-white dark:bg-gray-700 p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow border border-gray-200 dark:border-gray-600 group"
             >
@@ -108,9 +109,9 @@ export default function Home() {
               <p className="text-gray-600 dark:text-gray-300 text-sm">
                 Experience the interactive question cards and answer selection
               </p>
-            </a>
-            
-            <a
+            </Link>
+
+            <Link
               href="/scoreboard-demo"
               className="bg-white dark:bg-gray-700 p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow border border-gray-200 dark:border-gray-600 group"
             >
@@ -121,9 +122,9 @@ export default function Home() {
               <p className="text-gray-600 dark:text-gray-300 text-sm">
                 See real-time score updates and statistics tracking in action
               </p>
-            </a>
-            
-            <a
+            </Link>
+
+            <Link
               href="/game"
               className="bg-gradient-to-br from-blue-500 to-purple-600 p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow group"
             >
@@ -134,11 +135,11 @@ export default function Home() {
               <p className="text-blue-100 text-sm">
                 Jump straight into the complete AI trivia experience
               </p>
-            </a>
+            </Link>
           </div>
         </div>
       </div>
-      
+
       {/* Call to Action Section */}
       <CallToActionSection setIsModalOpen={setIsModalOpen} />
       {/* Footer */}
