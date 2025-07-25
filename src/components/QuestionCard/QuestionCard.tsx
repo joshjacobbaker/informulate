@@ -1,6 +1,8 @@
 import React from "react";
 import { Clock, BookOpen, Zap } from "lucide-react";
-import MultipleChoiceGroup, { MultipleChoiceOption } from "../MultipleChoiceGroup";
+import MultipleChoiceGroup, {
+  MultipleChoiceOption,
+} from "../MultipleChoiceGroup";
 
 export interface QuestionData {
   id: string;
@@ -54,7 +56,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
     return question.options.map((option, index) => {
       const letter = String.fromCharCode(65 + index); // A, B, C, D
       const text = option.replace(/^[A-E]\.\s*/, ""); // Remove letter prefix if it exists
-      
+
       return {
         letter,
         text,

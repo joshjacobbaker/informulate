@@ -1,5 +1,5 @@
-import React from 'react';
-import AnswerButton from '../AnswerButton';
+import React from "react";
+import AnswerButton from "../AnswerButton";
 
 export interface MultipleChoiceOption {
   letter: string;
@@ -14,9 +14,9 @@ export interface MultipleChoiceGroupProps {
   isSubmitted?: boolean;
   showFeedback?: boolean;
   disabled?: boolean;
-  variant?: 'default' | 'compact' | 'large';
+  variant?: "default" | "compact" | "large";
   animateOnHover?: boolean;
-  layout?: 'vertical' | 'grid' | 'horizontal';
+  layout?: "vertical" | "grid" | "horizontal";
   correctAnswer?: string;
 }
 
@@ -27,9 +27,9 @@ const MultipleChoiceGroup: React.FC<MultipleChoiceGroupProps> = ({
   isSubmitted = false,
   showFeedback = false,
   disabled = false,
-  variant = 'default',
+  variant = "default",
   animateOnHover = true,
-  layout = 'vertical',
+  layout = "vertical",
   correctAnswer,
 }) => {
   const handleAnswerSelect = (letter: string) => {
@@ -40,33 +40,35 @@ const MultipleChoiceGroup: React.FC<MultipleChoiceGroupProps> = ({
 
   const getLayoutClass = () => {
     switch (layout) {
-      case 'grid':
-        return 'grid grid-cols-1 md:grid-cols-2 gap-3';
-      case 'horizontal':
-        return 'flex flex-wrap gap-3';
-      case 'vertical':
+      case "grid":
+        return "grid grid-cols-1 md:grid-cols-2 gap-3";
+      case "horizontal":
+        return "flex flex-wrap gap-3";
+      case "vertical":
       default:
-        return 'space-y-3';
+        return "space-y-3";
     }
   };
 
   const getOptionItemClass = () => {
-    if (layout === 'horizontal') {
-      return 'flex-1 min-w-[200px]';
+    if (layout === "horizontal") {
+      return "flex-1 min-w-[200px]";
     }
-    return '';
+    return "";
   };
 
   return (
-    <div 
+    <div
       className={getLayoutClass()}
       role="group"
       aria-label="Multiple choice answers"
     >
       {options.map((option) => {
         const isSelected = selectedAnswer === option.letter;
-        const isCorrect = correctAnswer ? option.letter === correctAnswer : option.isCorrect;
-        
+        const isCorrect = correctAnswer
+          ? option.letter === correctAnswer
+          : option.isCorrect;
+
         return (
           <div key={option.letter} className={getOptionItemClass()}>
             <AnswerButton

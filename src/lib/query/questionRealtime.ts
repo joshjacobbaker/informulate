@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { SupabaseService } from '@/lib/supabase/service';
 import { Question, Answer, QuestionHistory } from '@/lib/supabase/types';
@@ -96,7 +96,7 @@ export function useQuestionRealtime(sessionId: string | null) {
     
   }, [queryClient, sessionId]);
 
-  // Handle answer submission broadcast events (from API)
+  // Handle answer submission broadcast events (from API) with enhanced feedback
   const handleAnswerBroadcast = useCallback((payload: {
     sessionId: string;
     questionId: string;
@@ -110,10 +110,39 @@ export function useQuestionRealtime(sessionId: string | null) {
     
     console.log('Real-time: Answer submitted broadcast', payload);
 
+    // Immediately update the submit answer cache with the result
+    queryClient.setQueryData(
+      ['submitAnswer', sessionId, payload.questionId],
+      {
+        success: true,
+        isCorrect: payload.isCorrect,
+        correctAnswer: '', // Will be filled by the API response
+        pointsEarned: payload.pointsEarned,
+        explanation: payload.explanation,
+        newScore: 0, // Will be updated when session refreshes
+        streak: 0, // Will be updated when session refreshes
+        timestamp: payload.timestamp,
+      }
+    );
+
     // Invalidate game session queries to refresh scores
     queryClient.invalidateQueries({
       queryKey: ['gameSessions', 'session', sessionId],
     });
+
+    // Trigger a notification about the answer result
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('answerFeedback', {
+        detail: {
+          sessionId: payload.sessionId,
+          questionId: payload.questionId,
+          isCorrect: payload.isCorrect,
+          pointsEarned: payload.pointsEarned,
+          explanation: payload.explanation,
+          timestamp: payload.timestamp,
+        }
+      }));
+    }
   }, [queryClient, sessionId]);
 
   // Handle question history updates (tracks which questions were asked)
@@ -128,6 +157,60 @@ export function useQuestionRealtime(sessionId: string | null) {
     queryClient.invalidateQueries({
       queryKey: ['questions', 'random', sessionId],
     });
+  }, [queryClient, sessionId]);
+
+  // Handle explanation ready broadcast events (when AI explanation is generated)
+  const handleExplanationReadyBroadcast = useCallback((payload: {
+    sessionId: string;
+    questionId: string;
+    explanation: string | object;
+    timestamp: string;
+  }) => {
+    if (!sessionId || payload.sessionId !== sessionId) return;
+    
+    console.log('Real-time: Explanation ready broadcast', payload);
+
+    // Trigger a custom event for the UI to pick up
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('explanationReady', {
+        detail: {
+          sessionId: payload.sessionId,
+          questionId: payload.questionId,
+          explanation: payload.explanation,
+          timestamp: payload.timestamp,
+        }
+      }));
+    }
+  }, [sessionId]);
+
+  // Handle complete answer broadcast events (final update with all info)
+  const handleAnswerCompleteBroadcast = useCallback((payload: {
+    sessionId: string;
+    questionId: string;
+    selectedAnswer: string;
+    isCorrect: boolean;
+    pointsEarned: number;
+    explanation?: string | object;
+    timestamp: string;
+  }) => {
+    if (!sessionId || payload.sessionId !== sessionId) return;
+    
+    console.log('Real-time: Answer complete broadcast', payload);
+
+    // Update the submit answer cache with complete result
+    queryClient.setQueryData(
+      ['submitAnswer', sessionId, payload.questionId],
+      {
+        success: true,
+        isCorrect: payload.isCorrect,
+        correctAnswer: '', // Will be filled by the API response
+        pointsEarned: payload.pointsEarned,
+        explanation: payload.explanation,
+        newScore: 0, // Will be updated when session refreshes
+        streak: 0, // Will be updated when session refreshes
+        timestamp: payload.timestamp,
+      }
+    );
   }, [queryClient, sessionId]);
 
   // Set up subscriptions
@@ -151,6 +234,12 @@ export function useQuestionRealtime(sessionId: string | null) {
     // Subscribe to broadcast events for answer submission  
     const answerBroadcastSubscription = supabaseService.subscribeToAnswerBroadcasts(handleAnswerBroadcast);
 
+    // Subscribe to broadcast events for explanation ready
+    const explanationReadySubscription = supabaseService.subscribeToExplanationReadyBroadcasts(handleExplanationReadyBroadcast);
+
+    // Subscribe to broadcast events for answer complete
+    const answerCompleteSubscription = supabaseService.subscribeToAnswerCompleteBroadcasts(handleAnswerCompleteBroadcast);
+
     console.log('Real-time subscriptions established for session:', sessionId);
 
     // Cleanup subscriptions
@@ -161,8 +250,10 @@ export function useQuestionRealtime(sessionId: string | null) {
       historySubscription.unsubscribe();
       questionBroadcastSubscription.unsubscribe();
       answerBroadcastSubscription.unsubscribe();
+      explanationReadySubscription.unsubscribe();
+      answerCompleteSubscription.unsubscribe();
     };
-  }, [sessionId, handleQuestionGenerated, handleQuestionBroadcast, handleAnswerSubmitted, handleAnswerBroadcast, handleQuestionAsked]);
+  }, [sessionId, handleQuestionGenerated, handleQuestionBroadcast, handleAnswerSubmitted, handleAnswerBroadcast, handleQuestionAsked, handleExplanationReadyBroadcast, handleAnswerCompleteBroadcast]);
 
   return {
     // Could return connection status or other utilities here
@@ -195,5 +286,65 @@ export function useQuestionNotifications(sessionId: string | null) {
 
   return {
     handleNewQuestionAvailable,
+  };
+}
+
+// Hook for real-time answer feedback notifications with explanation updates
+export function useAnswerFeedbackRealtime(sessionId: string | null) {
+  const [latestFeedback, setLatestFeedback] = useState<{
+    questionId: string;
+    isCorrect: boolean;
+    pointsEarned: number;
+    explanation?: string | object;
+    timestamp: string;
+    hasExplanation?: boolean;
+  } | null>(null);
+
+  useEffect(() => {
+    if (!sessionId || typeof window === 'undefined') return;
+
+    const handleAnswerFeedback = (event: CustomEvent) => {
+      const { detail } = event;
+      if (detail.sessionId === sessionId) {
+        setLatestFeedback({
+          questionId: detail.questionId,
+          isCorrect: detail.isCorrect,
+          pointsEarned: detail.pointsEarned,
+          explanation: detail.explanation,
+          timestamp: detail.timestamp,
+          hasExplanation: !!detail.explanation,
+        });
+
+        // Clear the feedback after a delay to reset state
+        setTimeout(() => {
+          setLatestFeedback(null);
+        }, 5000); // Clear after 5 seconds
+      }
+    };
+
+    const handleExplanationReady = (event: CustomEvent) => {
+      const { detail } = event;
+      if (detail.sessionId === sessionId && latestFeedback?.questionId === detail.questionId) {
+        setLatestFeedback(prev => prev ? {
+          ...prev,
+          explanation: detail.explanation,
+          hasExplanation: true,
+        } : null);
+      }
+    };
+
+    window.addEventListener('answerFeedback', handleAnswerFeedback as EventListener);
+    window.addEventListener('explanationReady', handleExplanationReady as EventListener);
+
+    return () => {
+      window.removeEventListener('answerFeedback', handleAnswerFeedback as EventListener);
+      window.removeEventListener('explanationReady', handleExplanationReady as EventListener);
+    };
+  }, [sessionId, latestFeedback?.questionId]);
+
+  return {
+    latestFeedback,
+    hasNewFeedback: latestFeedback !== null,
+    clearFeedback: () => setLatestFeedback(null),
   };
 }

@@ -397,6 +397,37 @@ export class SupabaseService {
       .subscribe()
   }
 
+  subscribeToExplanationReadyBroadcasts(callback: (payload: {
+    sessionId: string;
+    questionId: string;
+    explanation: string | object;
+    timestamp: string;
+  }) => void) {
+    return this.supabase
+      .channel('answer-updates')
+      .on('broadcast', { event: 'explanation-ready' }, (payload) => {
+        callback(payload.payload);
+      })
+      .subscribe()
+  }
+
+  subscribeToAnswerCompleteBroadcasts(callback: (payload: {
+    sessionId: string;
+    questionId: string;
+    selectedAnswer: string;
+    isCorrect: boolean;
+    pointsEarned: number;
+    explanation?: string | object;
+    timestamp: string;
+  }) => void) {
+    return this.supabase
+      .channel('answer-updates')
+      .on('broadcast', { event: 'answer-complete' }, (payload) => {
+        callback(payload.payload);
+      })
+      .subscribe()
+  }
+
   // Admin/Development functions
   async insertSampleQuestions(): Promise<void> {
     const sampleQuestions = [

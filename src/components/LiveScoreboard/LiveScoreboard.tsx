@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import React, { useEffect, useState } from 'react';
-import { Trophy, Target, Zap, TrendingUp, User, Calendar } from 'lucide-react';
-import { SupabaseService } from '@/lib/supabase/service';
-import { GameSession } from '@/lib/supabase/types';
+import React, { useEffect, useState } from "react";
+import { Trophy, Target, Zap, TrendingUp, User, Calendar } from "lucide-react";
+import { SupabaseService } from "@/lib/supabase/service";
+import { GameSession } from "@/lib/supabase/types";
 
 interface LiveScoreboardProps {
   sessionId: string;
@@ -24,7 +24,7 @@ interface ScoreboardStats {
 
 const LiveScoreboard: React.FC<LiveScoreboardProps> = ({
   sessionId,
-  className = '',
+  className = "",
   compact = false,
 }) => {
   const [stats, setStats] = useState<ScoreboardStats | null>(null);
@@ -35,10 +35,10 @@ const LiveScoreboard: React.FC<LiveScoreboardProps> = ({
   useEffect(() => {
     const loadSessionData = async () => {
       if (!sessionId) return;
-      
+
       setIsLoading(true);
       const supabaseService = new SupabaseService();
-      
+
       try {
         const session = await supabaseService.getGameSession(sessionId);
         if (session) {
@@ -48,14 +48,16 @@ const LiveScoreboard: React.FC<LiveScoreboardProps> = ({
             totalAnswers: session.total_answers,
             currentStreak: session.current_streak,
             maxStreak: session.max_streak,
-            accuracy: session.total_answers > 0 ? 
-              (session.correct_answers / session.total_answers) * 100 : 0,
+            accuracy:
+              session.total_answers > 0
+                ? (session.correct_answers / session.total_answers) * 100
+                : 0,
             playerId: session.player_id,
             isActive: session.is_active,
           });
         }
       } catch (error) {
-        console.error('Error loading session data:', error);
+        console.error("Error loading session data:", error);
       } finally {
         setIsLoading(false);
       }
@@ -69,25 +71,29 @@ const LiveScoreboard: React.FC<LiveScoreboardProps> = ({
     if (!sessionId) return;
 
     const supabaseService = new SupabaseService();
-    
+
     // Subscribe to real-time updates for this session
     const subscription = supabaseService.subscribeToGameSession(
       sessionId,
       (payload) => {
         const updatedSession = payload.new as GameSession;
-        
+
         setStats({
           score: updatedSession.score,
           correctAnswers: updatedSession.correct_answers,
           totalAnswers: updatedSession.total_answers,
           currentStreak: updatedSession.current_streak,
           maxStreak: updatedSession.max_streak,
-          accuracy: updatedSession.total_answers > 0 ? 
-            (updatedSession.correct_answers / updatedSession.total_answers) * 100 : 0,
+          accuracy:
+            updatedSession.total_answers > 0
+              ? (updatedSession.correct_answers /
+                  updatedSession.total_answers) *
+                100
+              : 0,
           playerId: updatedSession.player_id,
           isActive: updatedSession.is_active,
         });
-        
+
         setIsConnected(true);
       }
     );
@@ -115,7 +121,9 @@ const LiveScoreboard: React.FC<LiveScoreboardProps> = ({
 
   if (!stats) {
     return (
-      <div className={`bg-gray-100 dark:bg-gray-800 rounded-lg p-4 ${className}`}>
+      <div
+        className={`bg-gray-100 dark:bg-gray-800 rounded-lg p-4 ${className}`}
+      >
         <p className="text-gray-500 dark:text-gray-400 text-center">
           No game session data available
         </p>
@@ -123,12 +131,12 @@ const LiveScoreboard: React.FC<LiveScoreboardProps> = ({
     );
   }
 
-  const StatCard = ({ 
-    icon: Icon, 
-    label, 
-    value, 
-    color = 'text-blue-600 dark:text-blue-400',
-    highlight = false 
+  const StatCard = ({
+    icon: Icon,
+    label,
+    value,
+    color = "text-blue-600 dark:text-blue-400",
+    highlight = false,
   }: {
     icon: React.ElementType;
     label: string;
@@ -136,26 +144,32 @@ const LiveScoreboard: React.FC<LiveScoreboardProps> = ({
     color?: string;
     highlight?: boolean;
   }) => (
-    <div className={`
+    <div
+      className={`
       bg-white dark:bg-gray-800 rounded-lg p-3 border
-      ${highlight ? 'border-yellow-300 dark:border-yellow-600 bg-yellow-50 dark:bg-yellow-900/20' : 'border-gray-200 dark:border-gray-700'}
+      ${
+        highlight
+          ? "border-yellow-300 dark:border-yellow-600 bg-yellow-50 dark:bg-yellow-900/20"
+          : "border-gray-200 dark:border-gray-700"
+      }
       transition-all duration-300 hover:shadow-md
-    `}>
+    `}
+    >
       <div className="flex items-center space-x-2">
         <Icon className={`w-4 h-4 ${color}`} />
         <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
           {label}
         </span>
       </div>
-      <div className={`text-lg font-bold mt-1 ${color}`}>
-        {value}
-      </div>
+      <div className={`text-lg font-bold mt-1 ${color}`}>{value}</div>
     </div>
   );
 
   if (compact) {
     return (
-      <div className={`bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg p-3 border border-gray-200 dark:border-gray-700 ${className}`}>
+      <div
+        className={`bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg p-3 border border-gray-200 dark:border-gray-700 ${className}`}
+      >
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-1">
@@ -178,9 +192,13 @@ const LiveScoreboard: React.FC<LiveScoreboardProps> = ({
             </div>
           </div>
           <div className="flex items-center space-x-2">
-            <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
+            <div
+              className={`w-2 h-2 rounded-full ${
+                isConnected ? "bg-green-500" : "bg-red-500"
+              }`}
+            ></div>
             <span className="text-xs text-gray-500 dark:text-gray-400">
-              {isConnected ? 'Live' : 'Offline'}
+              {isConnected ? "Live" : "Offline"}
             </span>
           </div>
         </div>
@@ -189,7 +207,9 @@ const LiveScoreboard: React.FC<LiveScoreboardProps> = ({
   }
 
   return (
-    <div className={`bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-lg ${className}`}>
+    <div
+      className={`bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-lg ${className}`}
+    >
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-3">
@@ -208,12 +228,16 @@ const LiveScoreboard: React.FC<LiveScoreboardProps> = ({
             </div>
           </div>
         </div>
-        
+
         {/* Connection Status */}
         <div className="flex items-center space-x-2">
-          <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></div>
+          <div
+            className={`w-2 h-2 rounded-full ${
+              isConnected ? "bg-green-500 animate-pulse" : "bg-red-500"
+            }`}
+          ></div>
           <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
-            {isConnected ? 'Live Updates' : 'Offline'}
+            {isConnected ? "Live Updates" : "Offline"}
           </span>
         </div>
       </div>
@@ -227,23 +251,27 @@ const LiveScoreboard: React.FC<LiveScoreboardProps> = ({
           color="text-yellow-600 dark:text-yellow-400"
           highlight={stats.score > 0}
         />
-        
+
         <StatCard
           icon={Target}
           label="Correct"
           value={`${stats.correctAnswers}/${stats.totalAnswers}`}
           color="text-green-600 dark:text-green-400"
         />
-        
+
         <StatCard
           icon={TrendingUp}
           label="Accuracy"
           value={`${stats.accuracy.toFixed(1)}%`}
-          color={stats.accuracy >= 70 ? "text-green-600 dark:text-green-400" : 
-                stats.accuracy >= 50 ? "text-yellow-600 dark:text-yellow-400" : 
-                "text-red-600 dark:text-red-400"}
+          color={
+            stats.accuracy >= 70
+              ? "text-green-600 dark:text-green-400"
+              : stats.accuracy >= 50
+              ? "text-yellow-600 dark:text-yellow-400"
+              : "text-red-600 dark:text-red-400"
+          }
         />
-        
+
         <StatCard
           icon={Zap}
           label="Current Streak"
@@ -251,19 +279,23 @@ const LiveScoreboard: React.FC<LiveScoreboardProps> = ({
           color="text-orange-600 dark:text-orange-400"
           highlight={stats.currentStreak > 0}
         />
-        
+
         <StatCard
           icon={Zap}
           label="Best Streak"
           value={stats.maxStreak}
           color="text-purple-600 dark:text-purple-400"
         />
-        
+
         <StatCard
           icon={Calendar}
           label="Status"
           value={stats.isActive ? "Active" : "Ended"}
-          color={stats.isActive ? "text-green-600 dark:text-green-400" : "text-gray-600 dark:text-gray-400"}
+          color={
+            stats.isActive
+              ? "text-green-600 dark:text-green-400"
+              : "text-gray-600 dark:text-gray-400"
+          }
         />
       </div>
 
@@ -280,9 +312,11 @@ const LiveScoreboard: React.FC<LiveScoreboardProps> = ({
         <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
           <div
             className={`h-2 rounded-full transition-all duration-500 ${
-              stats.accuracy >= 70 ? 'bg-green-500' :
-              stats.accuracy >= 50 ? 'bg-yellow-500' :
-              'bg-red-500'
+              stats.accuracy >= 70
+                ? "bg-green-500"
+                : stats.accuracy >= 50
+                ? "bg-yellow-500"
+                : "bg-red-500"
             }`}
             style={{ width: `${Math.min(stats.accuracy, 100)}%` }}
           ></div>

@@ -1,41 +1,45 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import AnswerButton from '@/components/AnswerButton';
-import MultipleChoiceGroup from '@/components/MultipleChoiceGroup';
+import React, { useState } from "react";
+import AnswerButton from "@/components/AnswerButton";
+import MultipleChoiceGroup from "@/components/MultipleChoiceGroup";
 
 const sampleQuestions = [
   {
     id: 1,
-    question: 'What is the capital of France?',
+    question: "What is the capital of France?",
     options: [
-      { letter: 'A', text: 'London', isCorrect: false },
-      { letter: 'B', text: 'Berlin', isCorrect: false },
-      { letter: 'C', text: 'Paris', isCorrect: true },
-      { letter: 'D', text: 'Madrid', isCorrect: false },
+      { letter: "A", text: "London", isCorrect: false },
+      { letter: "B", text: "Berlin", isCorrect: false },
+      { letter: "C", text: "Paris", isCorrect: true },
+      { letter: "D", text: "Madrid", isCorrect: false },
     ],
-    correctAnswer: 'C',
+    correctAnswer: "C",
   },
   {
     id: 2,
-    question: 'Which programming language is known for web development?',
+    question: "Which programming language is known for web development?",
     options: [
-      { letter: 'A', text: 'Python', isCorrect: false },
-      { letter: 'B', text: 'JavaScript', isCorrect: true },
-      { letter: 'C', text: 'C++', isCorrect: false },
-      { letter: 'D', text: 'Java', isCorrect: false },
+      { letter: "A", text: "Python", isCorrect: false },
+      { letter: "B", text: "JavaScript", isCorrect: true },
+      { letter: "C", text: "C++", isCorrect: false },
+      { letter: "D", text: "Java", isCorrect: false },
     ],
-    correctAnswer: 'B',
+    correctAnswer: "B",
   },
 ];
 
 export default function AnswerButtonsDemo() {
   const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [selectedAnswer, setSelectedAnswer] = useState<string>('');
+  const [selectedAnswer, setSelectedAnswer] = useState<string>("");
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
-  const [layout, setLayout] = useState<'vertical' | 'grid' | 'horizontal'>('vertical');
-  const [variant, setVariant] = useState<'default' | 'compact' | 'large'>('default');
+  const [layout, setLayout] = useState<"vertical" | "grid" | "horizontal">(
+    "vertical"
+  );
+  const [variant, setVariant] = useState<"default" | "compact" | "large">(
+    "default"
+  );
 
   const question = sampleQuestions[currentQuestion];
 
@@ -53,13 +57,13 @@ export default function AnswerButtonsDemo() {
   const handleNextQuestion = () => {
     const nextIndex = (currentQuestion + 1) % sampleQuestions.length;
     setCurrentQuestion(nextIndex);
-    setSelectedAnswer('');
+    setSelectedAnswer("");
     setIsSubmitted(false);
     setShowFeedback(false);
   };
 
   const handleReset = () => {
-    setSelectedAnswer('');
+    setSelectedAnswer("");
     setIsSubmitted(false);
     setShowFeedback(false);
   };
@@ -73,8 +77,8 @@ export default function AnswerButtonsDemo() {
             Multiple Choice Answer Buttons
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-            Interactive answer buttons with multiple layouts, variants, and feedback states.
-            Perfect for quizzes, surveys, and trivia games.
+            Interactive answer buttons with multiple layouts, variants, and
+            feedback states. Perfect for quizzes, surveys, and trivia games.
           </p>
         </div>
 
@@ -95,7 +99,7 @@ export default function AnswerButtonsDemo() {
                 <option value="horizontal">Horizontal</option>
               </select>
             </div>
-            
+
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Variant
@@ -110,7 +114,7 @@ export default function AnswerButtonsDemo() {
                 <option value="large">Large</option>
               </select>
             </div>
-            
+
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Question
@@ -151,7 +155,7 @@ export default function AnswerButtonsDemo() {
               Submit Answer
             </button>
           )}
-          
+
           {isSubmitted && (
             <>
               <button
@@ -175,19 +179,23 @@ export default function AnswerButtonsDemo() {
           <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
             Individual AnswerButton Examples
           </h3>
-          
+
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div>
-              <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Default State</h4>
+              <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                Default State
+              </h4>
               <AnswerButton
                 letter="A"
                 text="Default answer button"
                 onClick={() => {}}
               />
             </div>
-            
+
             <div>
-              <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Selected State</h4>
+              <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                Selected State
+              </h4>
               <AnswerButton
                 letter="B"
                 text="Selected answer button"
@@ -195,9 +203,11 @@ export default function AnswerButtonsDemo() {
                 onClick={() => {}}
               />
             </div>
-            
+
             <div>
-              <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Correct Answer</h4>
+              <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                Correct Answer
+              </h4>
               <AnswerButton
                 letter="C"
                 text="Correct answer button"
@@ -206,9 +216,11 @@ export default function AnswerButtonsDemo() {
                 onClick={() => {}}
               />
             </div>
-            
+
             <div>
-              <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Incorrect Answer</h4>
+              <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                Incorrect Answer
+              </h4>
               <AnswerButton
                 letter="D"
                 text="Incorrect answer button"
@@ -218,9 +230,11 @@ export default function AnswerButtonsDemo() {
                 onClick={() => {}}
               />
             </div>
-            
+
             <div>
-              <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Disabled State</h4>
+              <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                Disabled State
+              </h4>
               <AnswerButton
                 letter="E"
                 text="Disabled answer button"
@@ -228,9 +242,11 @@ export default function AnswerButtonsDemo() {
                 onClick={() => {}}
               />
             </div>
-            
+
             <div>
-              <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Compact Variant</h4>
+              <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                Compact Variant
+              </h4>
               <AnswerButton
                 letter="F"
                 text="Compact answer button"
@@ -248,34 +264,38 @@ export default function AnswerButtonsDemo() {
               🎨 Multiple Variants
             </h3>
             <p className="text-gray-600 dark:text-gray-300 text-sm">
-              Compact, default, and large variants to fit different design needs and screen sizes.
+              Compact, default, and large variants to fit different design needs
+              and screen sizes.
             </p>
           </div>
-          
+
           <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
               📱 Flexible Layouts
             </h3>
             <p className="text-gray-600 dark:text-gray-300 text-sm">
-              Vertical, grid, and horizontal layouts for optimal presentation across devices.
+              Vertical, grid, and horizontal layouts for optimal presentation
+              across devices.
             </p>
           </div>
-          
+
           <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
               ✅ Visual Feedback
             </h3>
             <p className="text-gray-600 dark:text-gray-300 text-sm">
-              Clear visual indicators for correct/incorrect answers with checkmarks and X icons.
+              Clear visual indicators for correct/incorrect answers with
+              checkmarks and X icons.
             </p>
           </div>
-          
+
           <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
               ♿ Accessibility
             </h3>
             <p className="text-gray-600 dark:text-gray-300 text-sm">
-              ARIA labels, keyboard navigation, and focus management for inclusive design.
+              ARIA labels, keyboard navigation, and focus management for
+              inclusive design.
             </p>
           </div>
         </div>

@@ -1,38 +1,39 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import QuestionCard, { QuestionData } from '@/components/QuestionCard';
+import React, { useState } from "react";
+import QuestionCard, { QuestionData } from "@/components/QuestionCard";
 
 const demoQuestions: QuestionData[] = [
   {
-    id: 'demo-1',
-    question: 'What is the capital of France?',
-    options: ['A. London', 'B. Berlin', 'C. Paris', 'D. Madrid'],
-    correctAnswer: 'C',
-    category: 'Geography',
-    difficulty: 'easy',
+    id: "demo-1",
+    question: "What is the capital of France?",
+    options: ["A. London", "B. Berlin", "C. Paris", "D. Madrid"],
+    correctAnswer: "C",
+    category: "Geography",
+    difficulty: "easy",
   },
   {
-    id: 'demo-2',
-    question: 'Which programming language is known for its use in web development and has a name related to coffee?',
-    options: ['A. Python', 'B. JavaScript', 'C. Java', 'D. C++'],
-    correctAnswer: 'C',
-    category: 'Technology',
-    difficulty: 'medium',
+    id: "demo-2",
+    question:
+      "Which programming language is known for its use in web development and has a name related to coffee?",
+    options: ["A. Python", "B. JavaScript", "C. Java", "D. C++"],
+    correctAnswer: "C",
+    category: "Technology",
+    difficulty: "medium",
   },
   {
-    id: 'demo-3',
-    question: 'What is the time complexity of binary search in a sorted array?',
-    options: ['A. O(n)', 'B. O(log n)', 'C. O(n²)', 'D. O(1)'],
-    correctAnswer: 'B',
-    category: 'Computer Science',
-    difficulty: 'hard',
+    id: "demo-3",
+    question: "What is the time complexity of binary search in a sorted array?",
+    options: ["A. O(n)", "B. O(log n)", "C. O(n²)", "D. O(1)"],
+    correctAnswer: "B",
+    category: "Computer Science",
+    difficulty: "hard",
   },
 ];
 
 export default function DemoPage() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [selectedAnswer, setSelectedAnswer] = useState<string>('');
+  const [selectedAnswer, setSelectedAnswer] = useState<string>("");
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState<number>(30);
   const [showResult, setShowResult] = useState(false);
@@ -53,7 +54,7 @@ export default function DemoPage() {
   const handleNextQuestion = () => {
     const nextIndex = (currentQuestionIndex + 1) % demoQuestions.length;
     setCurrentQuestionIndex(nextIndex);
-    setSelectedAnswer('');
+    setSelectedAnswer("");
     setIsSubmitted(false);
     setShowResult(false);
     setTimeRemaining(30);
@@ -61,7 +62,7 @@ export default function DemoPage() {
 
   const handleReset = () => {
     setCurrentQuestionIndex(0);
-    setSelectedAnswer('');
+    setSelectedAnswer("");
     setIsSubmitted(false);
     setShowResult(false);
     setTimeRemaining(30);
@@ -76,33 +77,42 @@ export default function DemoPage() {
             Question Card Demo
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-            Experience our interactive question card component with different difficulty levels
-            and categories. This demo showcases the UI without requiring a game session.
+            Experience our interactive question card component with different
+            difficulty levels and categories. This demo showcases the UI without
+            requiring a game session.
           </p>
         </div>
 
         {/* Demo Controls */}
         <div className="flex flex-wrap justify-center gap-4 mb-8">
           <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-lg">
-            <span className="text-sm text-gray-600 dark:text-gray-300">Question:</span>
+            <span className="text-sm text-gray-600 dark:text-gray-300">
+              Question:
+            </span>
             <span className="ml-2 font-semibold text-gray-900 dark:text-white">
               {currentQuestionIndex + 1} of {demoQuestions.length}
             </span>
           </div>
           <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-lg">
-            <span className="text-sm text-gray-600 dark:text-gray-300">Difficulty:</span>
-            <span className={`ml-2 font-semibold capitalize ${
-              currentQuestion.difficulty === 'easy' 
-                ? 'text-green-600 dark:text-green-400'
-                : currentQuestion.difficulty === 'medium'
-                ? 'text-yellow-600 dark:text-yellow-400'
-                : 'text-red-600 dark:text-red-400'
-            }`}>
+            <span className="text-sm text-gray-600 dark:text-gray-300">
+              Difficulty:
+            </span>
+            <span
+              className={`ml-2 font-semibold capitalize ${
+                currentQuestion.difficulty === "easy"
+                  ? "text-green-600 dark:text-green-400"
+                  : currentQuestion.difficulty === "medium"
+                  ? "text-yellow-600 dark:text-yellow-400"
+                  : "text-red-600 dark:text-red-400"
+              }`}
+            >
               {currentQuestion.difficulty}
             </span>
           </div>
           <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-lg">
-            <span className="text-sm text-gray-600 dark:text-gray-300">Category:</span>
+            <span className="text-sm text-gray-600 dark:text-gray-300">
+              Category:
+            </span>
             <span className="ml-2 font-semibold text-gray-900 dark:text-white">
               {currentQuestion.category}
             </span>
@@ -129,7 +139,7 @@ export default function DemoPage() {
               Submit Answer
             </button>
           )}
-          
+
           {isSubmitted && (
             <>
               <button
@@ -151,33 +161,41 @@ export default function DemoPage() {
         {/* Result Display */}
         {showResult && (
           <div className="mt-8 max-w-2xl mx-auto">
-            <div className={`p-6 rounded-xl border-2 ${
-              selectedAnswer === currentQuestion.correctAnswer
-                ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
-                : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
-            }`}>
+            <div
+              className={`p-6 rounded-xl border-2 ${
+                selectedAnswer === currentQuestion.correctAnswer
+                  ? "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800"
+                  : "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800"
+              }`}
+            >
               <div className="text-center">
-                <h3 className={`text-2xl font-bold mb-3 ${
-                  selectedAnswer === currentQuestion.correctAnswer
-                    ? 'text-green-800 dark:text-green-200'
-                    : 'text-red-800 dark:text-red-200'
-                }`}>
-                  {selectedAnswer === currentQuestion.correctAnswer ? '🎉 Correct!' : '❌ Incorrect'}
-                </h3>
-                <p className={`text-lg mb-2 ${
-                  selectedAnswer === currentQuestion.correctAnswer
-                    ? 'text-green-700 dark:text-green-300'
-                    : 'text-red-700 dark:text-red-300'
-                }`}>
+                <h3
+                  className={`text-2xl font-bold mb-3 ${
+                    selectedAnswer === currentQuestion.correctAnswer
+                      ? "text-green-800 dark:text-green-200"
+                      : "text-red-800 dark:text-red-200"
+                  }`}
+                >
                   {selectedAnswer === currentQuestion.correctAnswer
-                    ? 'Well done! You got it right.'
-                    : `The correct answer was ${currentQuestion.correctAnswer}.`
-                  }
+                    ? "🎉 Correct!"
+                    : "❌ Incorrect"}
+                </h3>
+                <p
+                  className={`text-lg mb-2 ${
+                    selectedAnswer === currentQuestion.correctAnswer
+                      ? "text-green-700 dark:text-green-300"
+                      : "text-red-700 dark:text-red-300"
+                  }`}
+                >
+                  {selectedAnswer === currentQuestion.correctAnswer
+                    ? "Well done! You got it right."
+                    : `The correct answer was ${currentQuestion.correctAnswer}.`}
                 </p>
                 <div className="mt-4 p-4 bg-white dark:bg-gray-800 rounded-lg">
                   <p className="text-sm text-gray-600 dark:text-gray-300">
-                    <strong>Demo Note:</strong> In a real game, this would show AI-generated explanations,
-                    points earned, and updated scores with streak bonuses.
+                    <strong>Demo Note:</strong> In a real game, this would show
+                    AI-generated explanations, points earned, and updated scores
+                    with streak bonuses.
                   </p>
                 </div>
               </div>
@@ -192,7 +210,8 @@ export default function DemoPage() {
               🎨 Interactive Design
             </h3>
             <p className="text-gray-600 dark:text-gray-300 text-sm">
-              Responsive design with hover effects, animations, and visual feedback for selected answers.
+              Responsive design with hover effects, animations, and visual
+              feedback for selected answers.
             </p>
           </div>
           <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
@@ -200,7 +219,8 @@ export default function DemoPage() {
               ⏱️ Timer Integration
             </h3>
             <p className="text-gray-600 dark:text-gray-300 text-sm">
-              Built-in timer display with color-coded urgency indicators for time-based challenges.
+              Built-in timer display with color-coded urgency indicators for
+              time-based challenges.
             </p>
           </div>
           <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
@@ -208,7 +228,8 @@ export default function DemoPage() {
               🔍 Clear Feedback
             </h3>
             <p className="text-gray-600 dark:text-gray-300 text-sm">
-              Immediate visual feedback showing correct/incorrect answers with checkmarks and X icons.
+              Immediate visual feedback showing correct/incorrect answers with
+              checkmarks and X icons.
             </p>
           </div>
         </div>

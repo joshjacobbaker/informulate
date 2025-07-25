@@ -109,10 +109,32 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Generate explanation if requested
+    // Send immediate real-time feedback (without explanation first for faster response)
+    try {
+      await supabase
+        .channel('answer-updates')
+        .send({
+          type: 'broadcast',
+          event: 'answer-submitted',
+          payload: {
+            sessionId,
+            questionId,
+            selectedAnswer,
+            isCorrect,
+            pointsEarned,
+            explanation: null, // Will be sent in a follow-up broadcast
+            timestamp: new Date().toISOString()
+          }
+        })
+    } catch (realtimeError) {
+      console.warn('⚠️  Could not send immediate realtime update:', realtimeError)
+    }
+
+    // Generate explanation if requested (run concurrently with database updates for faster response)
     let explanation = null
+    
     if (generateExplanation) {
-      console.log('🧠 Generating explanation...')
+      console.log('🧠 Starting explanation generation...')
       try {
         const explanationResult = await ApiErrorHandler.retry(
           async () => await openAIService.generateExplanation({
@@ -127,21 +149,39 @@ export async function POST(request: NextRequest) {
           }
         )
 
-        if (explanationResult.success) {
+        if (explanationResult?.success) {
           explanation = explanationResult.explanation
+          
+          // Send a follow-up real-time update with the explanation
+          try {
+            await supabase
+              .channel('answer-updates')
+              .send({
+                type: 'broadcast',
+                event: 'explanation-ready',
+                payload: {
+                  sessionId,
+                  questionId,
+                  explanation,
+                  timestamp: new Date().toISOString()
+                }
+              })
+          } catch (explanationRealtimeError) {
+            console.warn('⚠️  Could not send explanation realtime update:', explanationRealtimeError)
+          }
         }
       } catch (explanationError) {
         console.warn('⚠️  Could not generate explanation:', explanationError)
       }
     }
 
-    // Trigger realtime update
+    // Final real-time update with complete information
     try {
       await supabase
         .channel('answer-updates')
         .send({
           type: 'broadcast',
-          event: 'answer-submitted',
+          event: 'answer-complete',
           payload: {
             sessionId,
             questionId,
@@ -153,7 +193,7 @@ export async function POST(request: NextRequest) {
           }
         })
     } catch (realtimeError) {
-      console.warn('⚠️  Could not send realtime update:', realtimeError)
+      console.warn('⚠️  Could not send final realtime update:', realtimeError)
     }
 
     console.log(`✅ Answer processed successfully (${pointsEarned} points earned)`)
@@ -165,6 +205,8 @@ export async function POST(request: NextRequest) {
         correctAnswer: question.correct_answer,
         pointsEarned,
         explanation,
+        newScore: currentSession ? currentSession.score + pointsEarned : pointsEarned,
+        streak: currentSession ? (isCorrect ? currentSession.current_streak + 1 : 0) : 0,
         questionDetails: {
           id: question.id,
           question: question.question_text,
