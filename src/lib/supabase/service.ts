@@ -343,6 +343,60 @@ export class SupabaseService {
       .subscribe()
   }
 
+  subscribeToQuestionHistory(sessionId: string, callback: (payload: { new: QuestionHistory }) => void) {
+    return this.supabase
+      .channel(`question-history-${sessionId}`)
+      .on('postgres_changes', 
+        { 
+          event: 'INSERT', 
+          schema: 'public', 
+          table: 'question_history',
+          filter: `session_id=eq.${sessionId}`
+        }, 
+        callback
+      )
+      .subscribe()
+  }
+
+  // Broadcast subscription methods
+  subscribeToQuestionBroadcasts(callback: (payload: {
+    sessionId: string;
+    question: {
+      id: string;
+      question: string;
+      options: string[];
+      correctAnswer: string;
+      category: string;
+      difficulty: string;
+    };
+    questionSource: string;
+    timestamp: string;
+  }) => void) {
+    return this.supabase
+      .channel('question-updates')
+      .on('broadcast', { event: 'question-generated' }, (payload) => {
+        callback(payload.payload);
+      })
+      .subscribe()
+  }
+
+  subscribeToAnswerBroadcasts(callback: (payload: {
+    sessionId: string;
+    questionId: string;
+    selectedAnswer: string;
+    isCorrect: boolean;
+    pointsEarned: number;
+    explanation?: string | object;
+    timestamp: string;
+  }) => void) {
+    return this.supabase
+      .channel('answer-updates')
+      .on('broadcast', { event: 'answer-submitted' }, (payload) => {
+        callback(payload.payload);
+      })
+      .subscribe()
+  }
+
   // Admin/Development functions
   async insertSampleQuestions(): Promise<void> {
     const sampleQuestions = [

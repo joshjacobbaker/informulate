@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { TriviaExplanation } from '@/lib/openai/types';
 
 // Types for question API
-export interface QuestionResponse {
+export interface QuestionResponse {  
   success: boolean;
   question: {
     id: string;
@@ -179,3 +179,6 @@ export function useQuestionUtils() {
     queryClient,
   };
 }
+
+// Export real-time functionality
+export { useQuestionRealtime, useQuestionNotifications } from './questionRealtime';
