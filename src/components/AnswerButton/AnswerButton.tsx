@@ -1,5 +1,5 @@
-import React from 'react';
-import { Check, X } from 'lucide-react';
+import React from "react";
+import { Check, X } from "lucide-react";
 
 export interface AnswerButtonProps {
   letter: string;
@@ -10,7 +10,7 @@ export interface AnswerButtonProps {
   showFeedback?: boolean;
   onClick?: () => void;
   disabled?: boolean;
-  variant?: 'default' | 'compact' | 'large';
+  variant?: "default" | "compact" | "large";
   animateOnHover?: boolean;
 }
 
@@ -23,22 +23,26 @@ const AnswerButton: React.FC<AnswerButtonProps> = ({
   showFeedback = false,
   onClick,
   disabled = false,
-  variant = 'default',
+  variant = "default",
   animateOnHover = true,
 }) => {
   const getButtonClass = () => {
-    const baseClass = 'w-full text-left border-2 transition-all duration-200 flex items-center gap-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2';
-    
+    const baseClass =
+      "w-full text-left border-2 transition-all duration-200 flex items-center gap-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2";
+
     // Variant classes
     const variantClasses = {
-      default: 'p-4 rounded-lg min-h-[60px]',
-      compact: 'p-3 rounded-lg min-h-[50px]',
-      large: 'p-5 rounded-xl min-h-[70px]',
+      default: "p-4 rounded-lg min-h-[60px]",
+      compact: "p-3 rounded-lg min-h-[50px]",
+      large: "p-5 rounded-xl min-h-[70px]",
     };
-    
+
     // Animation classes
-    const animationClass = animateOnHover && !disabled ? 'transform hover:scale-[1.01] active:scale-[0.99]' : '';
-    
+    const animationClass =
+      animateOnHover && !disabled
+        ? "transform hover:scale-[1.01] active:scale-[0.99]"
+        : "";
+
     // State-based styling
     if (isSubmitted || showFeedback) {
       if (isCorrect) {
@@ -62,14 +66,15 @@ const AnswerButton: React.FC<AnswerButtonProps> = ({
   };
 
   const getLetterBadgeClass = () => {
-    const baseClass = 'flex-shrink-0 w-8 h-8 rounded-full font-bold flex items-center justify-center text-white';
-    
-    if (variant === 'compact') {
-      return `${baseClass.replace('w-8 h-8', 'w-7 h-7')} text-sm`;
-    } else if (variant === 'large') {
-      return `${baseClass.replace('w-8 h-8', 'w-10 h-10')} text-lg`;
+    const baseClass =
+      "flex-shrink-0 w-8 h-8 rounded-full font-bold flex items-center justify-center text-white";
+
+    if (variant === "compact") {
+      return `${baseClass.replace("w-8 h-8", "w-7 h-7")} text-sm`;
+    } else if (variant === "large") {
+      return `${baseClass.replace("w-8 h-8", "w-10 h-10")} text-lg`;
     }
-    
+
     // Color based on state
     if (isSubmitted || showFeedback) {
       if (isCorrect) {
@@ -80,25 +85,25 @@ const AnswerButton: React.FC<AnswerButtonProps> = ({
         return `${baseClass} bg-gray-400`;
       }
     }
-    
+
     return `${baseClass} bg-blue-600 dark:bg-blue-500`;
   };
 
   const getTextClass = () => {
-    const baseClass = 'flex-grow';
-    
-    if (variant === 'compact') {
+    const baseClass = "flex-grow";
+
+    if (variant === "compact") {
       return `${baseClass} text-base`;
-    } else if (variant === 'large') {
+    } else if (variant === "large") {
       return `${baseClass} text-xl`;
     }
-    
+
     return `${baseClass} text-lg`;
   };
 
   const renderFeedbackIcon = () => {
     if (!showFeedback && !isSubmitted) return null;
-    
+
     if (isCorrect) {
       return (
         <div className="flex-shrink-0">
@@ -108,7 +113,7 @@ const AnswerButton: React.FC<AnswerButtonProps> = ({
         </div>
       );
     }
-    
+
     if (isSelected && !isCorrect) {
       return (
         <div className="flex-shrink-0">
@@ -118,7 +123,7 @@ const AnswerButton: React.FC<AnswerButtonProps> = ({
         </div>
       );
     }
-    
+
     return null;
   };
 
@@ -131,9 +136,7 @@ const AnswerButton: React.FC<AnswerButtonProps> = ({
       aria-label={`Option ${letter}: ${text}`}
       data-testid={`answer-button-${letter}`}
     >
-      <div className={getLetterBadgeClass()}>
-        {letter}
-      </div>
+      <div className={getLetterBadgeClass()}>{letter}</div>
       <span className={getTextClass()}>{text}</span>
       {renderFeedbackIcon()}
     </button>

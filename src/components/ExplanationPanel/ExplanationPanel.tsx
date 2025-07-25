@@ -1,5 +1,11 @@
-import React from 'react';
-import { CheckCircle, XCircle, Lightbulb, BookOpen, Sparkles } from 'lucide-react';
+import React from "react";
+import {
+  CheckCircle,
+  XCircle,
+  Lightbulb,
+  BookOpen,
+  Sparkles,
+} from "lucide-react";
 
 export interface ExplanationData {
   explanation: string;
@@ -13,7 +19,7 @@ export interface ExplanationPanelProps {
   userAnswer?: string;
   explanation?: ExplanationData | string;
   pointsEarned?: number;
-  variant?: 'default' | 'compact' | 'detailed';
+  variant?: "default" | "compact" | "detailed";
   animateOnMount?: boolean;
   showScoreInfo?: boolean;
   className?: string;
@@ -25,16 +31,16 @@ const ExplanationPanel: React.FC<ExplanationPanelProps> = ({
   userAnswer,
   explanation,
   pointsEarned = 0,
-  variant = 'default',
+  variant = "default",
   animateOnMount = true,
   showScoreInfo = true,
-  className = '',
+  className = "",
 }) => {
   // Parse explanation data
   const getExplanationData = (): ExplanationData | null => {
     if (!explanation) return null;
-    
-    if (typeof explanation === 'string') {
+
+    if (typeof explanation === "string") {
       try {
         // Try to parse as JSON if it's a string
         const parsed = JSON.parse(explanation);
@@ -45,12 +51,12 @@ const ExplanationPanel: React.FC<ExplanationPanelProps> = ({
         // If parsing fails, treat as simple explanation
         return {
           explanation,
-          reasoning: '',
+          reasoning: "",
           additionalInfo: undefined,
         };
       }
     }
-    
+
     return explanation as ExplanationData;
   };
 
@@ -59,9 +65,12 @@ const ExplanationPanel: React.FC<ExplanationPanelProps> = ({
   // Styling based on correctness
   const getContainerClass = () => {
     const baseClass = `rounded-xl border-2 transition-all duration-300`;
-    const animationClass = animateOnMount ? 'animate-in slide-in-from-bottom-4 fade-in duration-500' : '';
-    const variantClass = variant === 'compact' ? 'p-4' : variant === 'detailed' ? 'p-8' : 'p-6';
-    
+    const animationClass = animateOnMount
+      ? "animate-in slide-in-from-bottom-4 fade-in duration-500"
+      : "";
+    const variantClass =
+      variant === "compact" ? "p-4" : variant === "detailed" ? "p-8" : "p-6";
+
     if (isCorrect) {
       return `${baseClass} ${variantClass} ${animationClass} bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 ${className}`;
     } else {
@@ -71,36 +80,38 @@ const ExplanationPanel: React.FC<ExplanationPanelProps> = ({
 
   const getHeaderClass = () => {
     if (isCorrect) {
-      return 'text-green-800 dark:text-green-200';
+      return "text-green-800 dark:text-green-200";
     } else {
-      return 'text-red-800 dark:text-red-200';
+      return "text-red-800 dark:text-red-200";
     }
   };
 
   const getTextClass = () => {
     if (isCorrect) {
-      return 'text-green-700 dark:text-green-300';
+      return "text-green-700 dark:text-green-300";
     } else {
-      return 'text-red-700 dark:text-red-300';
+      return "text-red-700 dark:text-red-300";
     }
   };
 
   const getHeaderIcon = () => {
     if (isCorrect) {
-      return <CheckCircle className="w-6 h-6 text-green-600 dark:text-green-400" />;
+      return (
+        <CheckCircle className="w-6 h-6 text-green-600 dark:text-green-400" />
+      );
     } else {
       return <XCircle className="w-6 h-6 text-red-600 dark:text-red-400" />;
     }
   };
 
-  if (variant === 'compact') {
+  if (variant === "compact") {
     return (
       <div className={getContainerClass()}>
         <div className="flex items-start gap-3">
           {getHeaderIcon()}
           <div className="flex-1">
             <div className={`font-semibold text-sm ${getHeaderClass()}`}>
-              {isCorrect ? '🎉 Correct!' : '❌ Incorrect'}
+              {isCorrect ? "🎉 Correct!" : "❌ Incorrect"}
             </div>
             {explanationData?.explanation && (
               <p className="text-gray-600 dark:text-gray-300 text-sm mt-1">
@@ -120,14 +131,13 @@ const ExplanationPanel: React.FC<ExplanationPanelProps> = ({
         {getHeaderIcon()}
         <div className="flex-1">
           <h3 className={`text-xl font-bold ${getHeaderClass()}`}>
-            {isCorrect ? '🎉 Excellent!' : '❌ Not Quite Right'}
+            {isCorrect ? "🎉 Excellent!" : "❌ Not Quite Right"}
           </h3>
           {showScoreInfo && (
             <p className={`text-sm ${getTextClass()} mt-1`}>
-              {isCorrect 
-                ? `+${pointsEarned} points earned!` 
-                : `The correct answer was ${correctAnswer}`
-              }
+              {isCorrect
+                ? `+${pointsEarned} points earned!`
+                : `The correct answer was ${correctAnswer}`}
             </p>
           )}
         </div>
@@ -136,13 +146,16 @@ const ExplanationPanel: React.FC<ExplanationPanelProps> = ({
       {/* Answer Summary (for incorrect answers) */}
       {!isCorrect && userAnswer && (
         <div className="mb-4 p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-          <div className="text-sm text-gray-600 dark:text-gray-400 mb-2">Answer Summary:</div>
+          <div className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+            Answer Summary:
+          </div>
           <div className="flex flex-col gap-1 text-sm">
             <div className="text-red-600 dark:text-red-400">
               <span className="font-medium">Your answer:</span> {userAnswer}
             </div>
             <div className="text-green-600 dark:text-green-400">
-              <span className="font-medium">Correct answer:</span> {correctAnswer}
+              <span className="font-medium">Correct answer:</span>{" "}
+              {correctAnswer}
             </div>
           </div>
         </div>
@@ -164,7 +177,7 @@ const ExplanationPanel: React.FC<ExplanationPanelProps> = ({
       )}
 
       {/* Detailed Reasoning */}
-      {explanationData?.reasoning && variant === 'detailed' && (
+      {explanationData?.reasoning && variant === "detailed" && (
         <div className="mb-4">
           <div className="flex items-center gap-2 mb-2">
             <Lightbulb className="w-4 h-4 text-yellow-600 dark:text-yellow-400" />
@@ -194,13 +207,12 @@ const ExplanationPanel: React.FC<ExplanationPanelProps> = ({
       )}
 
       {/* Encouragement Message */}
-      {variant === 'detailed' && (
+      {variant === "detailed" && (
         <div className="mt-4 pt-3 border-t border-gray-200 dark:border-gray-700">
           <p className={`text-center text-sm font-medium ${getTextClass()}`}>
-            {isCorrect 
-              ? "Great job! Keep up the excellent work! 🌟" 
-              : "Every mistake is a learning opportunity. You've got this! 💪"
-            }
+            {isCorrect
+              ? "Great job! Keep up the excellent work! 🌟"
+              : "Every mistake is a learning opportunity. You've got this! 💪"}
           </p>
         </div>
       )}

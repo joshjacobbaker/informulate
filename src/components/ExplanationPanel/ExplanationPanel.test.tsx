@@ -1,239 +1,250 @@
-import React from 'react';
-import { render, screen } from '@testing-library/react';
-import ExplanationPanel, { ExplanationData } from './ExplanationPanel';
+import React from "react";
+import { render, screen } from "@testing-library/react";
+import ExplanationPanel, { ExplanationData } from "./ExplanationPanel";
 
 const mockExplanationData: ExplanationData = {
-  explanation: 'This is the main explanation for the answer.',
-  reasoning: 'This is the detailed reasoning behind the correct answer.',
-  additionalInfo: 'Here is some additional fun fact information.',
+  explanation: "This is the main explanation for the answer.",
+  reasoning: "This is the detailed reasoning behind the correct answer.",
+  additionalInfo: "Here is some additional fun fact information.",
 };
 
-const mockSimpleExplanation = 'This is a simple string explanation.';
+const mockSimpleExplanation = "This is a simple string explanation.";
 
-describe('ExplanationPanel', () => {
+describe("ExplanationPanel", () => {
   const defaultProps = {
     isCorrect: true,
-    correctAnswer: 'C. Paris',
-    userAnswer: 'C. Paris',
+    correctAnswer: "C. Paris",
+    userAnswer: "C. Paris",
     pointsEarned: 10,
   };
 
-  it('renders correct answer state', () => {
-    render(<ExplanationPanel {...defaultProps} explanation={mockExplanationData} />);
-    
-    expect(screen.getByText('🎉 Excellent!')).toBeInTheDocument();
-    expect(screen.getByText('+10 points earned!')).toBeInTheDocument();
-    expect(screen.getByText(mockExplanationData.explanation)).toBeInTheDocument();
+  it("renders correct answer state", () => {
+    render(
+      <ExplanationPanel {...defaultProps} explanation={mockExplanationData} />
+    );
+
+    expect(screen.getByText("🎉 Excellent!")).toBeInTheDocument();
+    expect(screen.getByText("+10 points earned!")).toBeInTheDocument();
+    expect(
+      screen.getByText(mockExplanationData.explanation)
+    ).toBeInTheDocument();
   });
 
-  it('renders incorrect answer state', () => {
+  it("renders incorrect answer state", () => {
     render(
-      <ExplanationPanel 
-        {...defaultProps} 
+      <ExplanationPanel
+        {...defaultProps}
         isCorrect={false}
         userAnswer="A. London"
         explanation={mockExplanationData}
       />
     );
-    
-    expect(screen.getByText('❌ Not Quite Right')).toBeInTheDocument();
-    expect(screen.getByText('The correct answer was C. Paris')).toBeInTheDocument();
+
+    expect(screen.getByText("❌ Not Quite Right")).toBeInTheDocument();
+    expect(
+      screen.getByText("The correct answer was C. Paris")
+    ).toBeInTheDocument();
     expect(screen.getByText(/Your answer:/)).toBeInTheDocument();
-    expect(screen.getByText('A. London')).toBeInTheDocument();
+    expect(screen.getByText("A. London")).toBeInTheDocument();
     expect(screen.getByText(/Correct answer:/)).toBeInTheDocument();
-    expect(screen.getByText('C. Paris')).toBeInTheDocument();
+    expect(screen.getByText("C. Paris")).toBeInTheDocument();
   });
 
-  it('handles simple string explanation', () => {
+  it("handles simple string explanation", () => {
     render(
-      <ExplanationPanel 
-        {...defaultProps} 
-        explanation={mockSimpleExplanation}
-      />
+      <ExplanationPanel {...defaultProps} explanation={mockSimpleExplanation} />
     );
-    
+
     expect(screen.getByText(mockSimpleExplanation)).toBeInTheDocument();
   });
 
-  it('handles JSON string explanation', () => {
+  it("handles JSON string explanation", () => {
     const jsonExplanation = JSON.stringify(mockExplanationData);
-    
+
     render(
-      <ExplanationPanel 
-        {...defaultProps} 
-        explanation={jsonExplanation}
-      />
+      <ExplanationPanel {...defaultProps} explanation={jsonExplanation} />
     );
-    
-    expect(screen.getByText(mockExplanationData.explanation)).toBeInTheDocument();
+
+    expect(
+      screen.getByText(mockExplanationData.explanation)
+    ).toBeInTheDocument();
   });
 
-  it('renders compact variant', () => {
+  it("renders compact variant", () => {
     render(
-      <ExplanationPanel 
-        {...defaultProps} 
+      <ExplanationPanel
+        {...defaultProps}
         variant="compact"
         explanation={mockExplanationData}
       />
     );
-    
-    expect(screen.getByText('🎉 Correct!')).toBeInTheDocument();
-    expect(screen.getByText(mockExplanationData.explanation)).toBeInTheDocument();
+
+    expect(screen.getByText("🎉 Correct!")).toBeInTheDocument();
+    expect(
+      screen.getByText(mockExplanationData.explanation)
+    ).toBeInTheDocument();
     // Should not show detailed reasoning in compact mode
-    expect(screen.queryByText('Why This Answer')).not.toBeInTheDocument();
+    expect(screen.queryByText("Why This Answer")).not.toBeInTheDocument();
   });
 
-  it('renders detailed variant with all sections', () => {
+  it("renders detailed variant with all sections", () => {
     render(
-      <ExplanationPanel 
-        {...defaultProps} 
+      <ExplanationPanel
+        {...defaultProps}
         variant="detailed"
         explanation={mockExplanationData}
       />
     );
-    
-    expect(screen.getByText('Explanation')).toBeInTheDocument();
-    expect(screen.getByText('Why This Answer')).toBeInTheDocument();
-    expect(screen.getByText('Did You Know?')).toBeInTheDocument();
-    expect(screen.getByText(mockExplanationData.explanation)).toBeInTheDocument();
+
+    expect(screen.getByText("Explanation")).toBeInTheDocument();
+    expect(screen.getByText("Why This Answer")).toBeInTheDocument();
+    expect(screen.getByText("Did You Know?")).toBeInTheDocument();
+    expect(
+      screen.getByText(mockExplanationData.explanation)
+    ).toBeInTheDocument();
     expect(screen.getByText(mockExplanationData.reasoning)).toBeInTheDocument();
-    expect(screen.getByText(mockExplanationData.additionalInfo!)).toBeInTheDocument();
-    expect(screen.getByText('Great job! Keep up the excellent work! 🌟')).toBeInTheDocument();
+    expect(
+      screen.getByText(mockExplanationData.additionalInfo!)
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Great job! Keep up the excellent work! 🌟")
+    ).toBeInTheDocument();
   });
 
-  it('shows encouragement message for incorrect answers in detailed mode', () => {
+  it("shows encouragement message for incorrect answers in detailed mode", () => {
     render(
-      <ExplanationPanel 
-        {...defaultProps} 
+      <ExplanationPanel
+        {...defaultProps}
         isCorrect={false}
         variant="detailed"
         explanation={mockExplanationData}
       />
     );
-    
-    expect(screen.getByText("Every mistake is a learning opportunity. You've got this! 💪")).toBeInTheDocument();
+
+    expect(
+      screen.getByText(
+        "Every mistake is a learning opportunity. You've got this! 💪"
+      )
+    ).toBeInTheDocument();
   });
 
-  it('handles missing explanation data gracefully', () => {
+  it("handles missing explanation data gracefully", () => {
     render(<ExplanationPanel {...defaultProps} />);
-    
-    expect(screen.getByText('🎉 Excellent!')).toBeInTheDocument();
-    expect(screen.getByText('+10 points earned!')).toBeInTheDocument();
+
+    expect(screen.getByText("🎉 Excellent!")).toBeInTheDocument();
+    expect(screen.getByText("+10 points earned!")).toBeInTheDocument();
     // Should not crash without explanation
-    expect(screen.queryByText('Explanation')).not.toBeInTheDocument();
+    expect(screen.queryByText("Explanation")).not.toBeInTheDocument();
   });
 
-  it('hides score info when showScoreInfo is false', () => {
+  it("hides score info when showScoreInfo is false", () => {
     render(
-      <ExplanationPanel 
-        {...defaultProps} 
+      <ExplanationPanel
+        {...defaultProps}
         showScoreInfo={false}
         explanation={mockExplanationData}
       />
     );
-    
-    expect(screen.queryByText('+10 points earned!')).not.toBeInTheDocument();
+
+    expect(screen.queryByText("+10 points earned!")).not.toBeInTheDocument();
   });
 
-  it('applies custom className', () => {
+  it("applies custom className", () => {
     const { container } = render(
-      <ExplanationPanel 
-        {...defaultProps} 
+      <ExplanationPanel
+        {...defaultProps}
         className="custom-class"
         explanation={mockExplanationData}
       />
     );
-    
-    expect(container.firstChild).toHaveClass('custom-class');
+
+    expect(container.firstChild).toHaveClass("custom-class");
   });
 
-  it('shows correct icons for correct and incorrect answers', () => {
+  it("shows correct icons for correct and incorrect answers", () => {
     const { container, rerender } = render(
       <ExplanationPanel {...defaultProps} explanation={mockExplanationData} />
     );
-    
+
     // Check for correct answer icon (CheckCircle) - look for the lucide class
-    expect(container.querySelector('.lucide-circle-check-big')).toBeInTheDocument();
-    
+    expect(
+      container.querySelector(".lucide-circle-check-big")
+    ).toBeInTheDocument();
+
     rerender(
-      <ExplanationPanel 
-        {...defaultProps} 
+      <ExplanationPanel
+        {...defaultProps}
         isCorrect={false}
         explanation={mockExplanationData}
       />
     );
-    
+
     // Check for incorrect answer icon (XCircle) - look for the lucide class
-    expect(container.querySelector('.lucide-circle-x')).toBeInTheDocument();
+    expect(container.querySelector(".lucide-circle-x")).toBeInTheDocument();
   });
 
-  it('handles explanation data with missing optional fields', () => {
+  it("handles explanation data with missing optional fields", () => {
     const partialExplanation: ExplanationData = {
-      explanation: 'Main explanation only',
-      reasoning: 'Basic reasoning',
+      explanation: "Main explanation only",
+      reasoning: "Basic reasoning",
       // additionalInfo is missing
     };
-    
+
     render(
-      <ExplanationPanel 
-        {...defaultProps} 
+      <ExplanationPanel
+        {...defaultProps}
         variant="detailed"
         explanation={partialExplanation}
       />
     );
-    
-    expect(screen.getByText('Main explanation only')).toBeInTheDocument();
-    expect(screen.getByText('Basic reasoning')).toBeInTheDocument();
-    expect(screen.queryByText('Did You Know?')).not.toBeInTheDocument();
+
+    expect(screen.getByText("Main explanation only")).toBeInTheDocument();
+    expect(screen.getByText("Basic reasoning")).toBeInTheDocument();
+    expect(screen.queryByText("Did You Know?")).not.toBeInTheDocument();
   });
 
-  it('handles malformed JSON gracefully', () => {
+  it("handles malformed JSON gracefully", () => {
     const malformedJson = '{"explanation": "test", "reasoning":}'; // Invalid JSON
-    
-    render(
-      <ExplanationPanel 
-        {...defaultProps} 
-        explanation={malformedJson}
-      />
-    );
-    
+
+    render(<ExplanationPanel {...defaultProps} explanation={malformedJson} />);
+
     // Should treat as simple string explanation
     expect(screen.getByText(malformedJson)).toBeInTheDocument();
   });
 
-  it('renders without animation when animateOnMount is false', () => {
+  it("renders without animation when animateOnMount is false", () => {
     const { container } = render(
-      <ExplanationPanel 
-        {...defaultProps} 
+      <ExplanationPanel
+        {...defaultProps}
         animateOnMount={false}
         explanation={mockExplanationData}
       />
     );
-    
-    expect(container.firstChild).not.toHaveClass('animate-in');
+
+    expect(container.firstChild).not.toHaveClass("animate-in");
   });
 
-  it('shows answer summary only for incorrect answers', () => {
+  it("shows answer summary only for incorrect answers", () => {
     const { rerender } = render(
-      <ExplanationPanel 
-        {...defaultProps} 
+      <ExplanationPanel
+        {...defaultProps}
         isCorrect={true}
         userAnswer="C. Paris"
         explanation={mockExplanationData}
       />
     );
-    
-    expect(screen.queryByText('Answer Summary:')).not.toBeInTheDocument();
-    
+
+    expect(screen.queryByText("Answer Summary:")).not.toBeInTheDocument();
+
     rerender(
-      <ExplanationPanel 
-        {...defaultProps} 
+      <ExplanationPanel
+        {...defaultProps}
         isCorrect={false}
         userAnswer="A. London"
         explanation={mockExplanationData}
       />
     );
-    
-    expect(screen.getByText('Answer Summary:')).toBeInTheDocument();
+
+    expect(screen.getByText("Answer Summary:")).toBeInTheDocument();
   });
 });

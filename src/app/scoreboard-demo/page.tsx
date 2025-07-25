@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { LiveScoreboard } from '@/components';
-import { SupabaseService } from '@/lib/supabase/service';
+import React, { useState } from "react";
+import { LiveScoreboard } from "@/components";
+import { SupabaseService } from "@/lib/supabase/service";
 
 export default function ScoreboardDemoPage() {
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -18,24 +18,24 @@ export default function ScoreboardDemoPage() {
   // Create a demo session
   const createDemoSession = async () => {
     setIsCreatingSession(true);
-    
+
     try {
-      const response = await fetch('/api/create-session', {
-        method: 'POST',
+      const response = await fetch("/api/create-session", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          playerId: 'demo-player',
-          difficultyPreference: 'medium',
-          categoryPreference: 'Technology'
-        })
+          playerId: "demo-player",
+          difficultyPreference: "medium",
+          categoryPreference: "Technology",
+        }),
       });
 
       const data = await response.json();
       if (data.success) {
         setSessionId(data.session.id);
-        
+
         // Update the session with demo stats
         const supabaseService = new SupabaseService();
         await supabaseService.updateGameSession(data.session.id, {
@@ -47,7 +47,7 @@ export default function ScoreboardDemoPage() {
         });
       }
     } catch (error) {
-      console.error('Error creating demo session:', error);
+      console.error("Error creating demo session:", error);
     } finally {
       setIsCreatingSession(false);
     }
@@ -63,7 +63,10 @@ export default function ScoreboardDemoPage() {
       correct_answers: simulateStats.correctAnswers + 1,
       total_answers: simulateStats.totalAnswers + 1,
       current_streak: simulateStats.currentStreak + 1,
-      max_streak: Math.max(simulateStats.maxStreak, simulateStats.currentStreak + 1),
+      max_streak: Math.max(
+        simulateStats.maxStreak,
+        simulateStats.currentStreak + 1
+      ),
     };
 
     setSimulateStats({
@@ -77,7 +80,7 @@ export default function ScoreboardDemoPage() {
     try {
       await supabaseService.updateGameSession(sessionId, newStats);
     } catch (error) {
-      console.error('Error updating demo session:', error);
+      console.error("Error updating demo session:", error);
     }
   };
 
@@ -99,7 +102,7 @@ export default function ScoreboardDemoPage() {
     try {
       await supabaseService.updateGameSession(sessionId, newStats);
     } catch (error) {
-      console.error('Error updating demo session:', error);
+      console.error("Error updating demo session:", error);
     }
   };
 
@@ -112,8 +115,9 @@ export default function ScoreboardDemoPage() {
             Live Scoreboard Demo
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-            Experience the real-time scoreboard that updates instantly as players progress through the game.
-            This demo showcases live statistics tracking with Supabase Realtime.
+            Experience the real-time scoreboard that updates instantly as
+            players progress through the game. This demo showcases live
+            statistics tracking with Supabase Realtime.
           </p>
         </div>
 
@@ -132,7 +136,7 @@ export default function ScoreboardDemoPage() {
                 disabled={isCreatingSession}
                 className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-2 px-4 rounded-lg transition-colors"
               >
-                {isCreatingSession ? 'Creating Session...' : 'Start Demo'}
+                {isCreatingSession ? "Creating Session..." : "Start Demo"}
               </button>
             </div>
           </div>
@@ -155,7 +159,7 @@ export default function ScoreboardDemoPage() {
                   Compact View
                 </h2>
                 <LiveScoreboard sessionId={sessionId} compact />
-                
+
                 {/* Demo Controls */}
                 <div className="mt-6 space-y-4">
                   <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
@@ -175,11 +179,13 @@ export default function ScoreboardDemoPage() {
                       ❌ Wrong Answer (reset streak)
                     </button>
                   </div>
-                  
+
                   <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
                     <p className="text-sm text-blue-800 dark:text-blue-200">
-                      <strong>💡 Tip:</strong> Watch how the scoreboard updates in real-time when you click the buttons above. 
-                      In a real game, these updates happen automatically as players answer questions.
+                      <strong>💡 Tip:</strong> Watch how the scoreboard updates
+                      in real-time when you click the buttons above. In a real
+                      game, these updates happen automatically as players answer
+                      questions.
                     </p>
                   </div>
                 </div>
@@ -191,7 +197,7 @@ export default function ScoreboardDemoPage() {
               <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-6">
                 Scoreboard Features
               </h2>
-              
+
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div className="space-y-2">
                   <h3 className="font-semibold text-gray-800 dark:text-gray-200">
@@ -201,7 +207,7 @@ export default function ScoreboardDemoPage() {
                     Instant score updates using Supabase Realtime subscriptions
                   </p>
                 </div>
-                
+
                 <div className="space-y-2">
                   <h3 className="font-semibold text-gray-800 dark:text-gray-200">
                     📊 Comprehensive Stats
@@ -210,7 +216,7 @@ export default function ScoreboardDemoPage() {
                     Score, accuracy, streaks, and progress tracking
                   </p>
                 </div>
-                
+
                 <div className="space-y-2">
                   <h3 className="font-semibold text-gray-800 dark:text-gray-200">
                     🎨 Dynamic UI
@@ -219,7 +225,7 @@ export default function ScoreboardDemoPage() {
                     Color-coded performance indicators and animations
                   </p>
                 </div>
-                
+
                 <div className="space-y-2">
                   <h3 className="font-semibold text-gray-800 dark:text-gray-200">
                     📱 Responsive Design
@@ -228,7 +234,7 @@ export default function ScoreboardDemoPage() {
                     Compact and full views for different screen sizes
                   </p>
                 </div>
-                
+
                 <div className="space-y-2">
                   <h3 className="font-semibold text-gray-800 dark:text-gray-200">
                     🔥 Streak Celebrations
@@ -237,7 +243,7 @@ export default function ScoreboardDemoPage() {
                     Special animations and notifications for achievement streaks
                   </p>
                 </div>
-                
+
                 <div className="space-y-2">
                   <h3 className="font-semibold text-gray-800 dark:text-gray-200">
                     📡 Connection Status
@@ -254,7 +260,7 @@ export default function ScoreboardDemoPage() {
               <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
                 Integration Instructions
               </h2>
-              
+
               <div className="space-y-4">
                 <div>
                   <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-2">
@@ -264,7 +270,7 @@ export default function ScoreboardDemoPage() {
                     import {`{ LiveScoreboard }`} from &apos;@/components&apos;;
                   </div>
                 </div>
-                
+
                 <div>
                   <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-2">
                     2. Use in Your Game UI
@@ -273,14 +279,15 @@ export default function ScoreboardDemoPage() {
                     {`<LiveScoreboard sessionId={sessionId} compact={true} />`}
                   </div>
                 </div>
-                
+
                 <div>
                   <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-2">
                     3. Real-time Updates
                   </h3>
                   <p className="text-sm text-gray-600 dark:text-gray-300">
-                    The component automatically subscribes to Supabase Realtime updates for the game session. 
-                    No additional setup required - it will update instantly when scores change!
+                    The component automatically subscribes to Supabase Realtime
+                    updates for the game session. No additional setup required -
+                    it will update instantly when scores change!
                   </p>
                 </div>
               </div>
