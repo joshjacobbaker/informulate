@@ -428,6 +428,32 @@ export class SupabaseService {
       .subscribe()
   }
 
+  subscribeToScoreBroadcasts(callback: (payload: {
+    sessionId: string;
+    oldScore: number;
+    newScore: number;
+    pointsEarned: number;
+    isCorrect: boolean;
+    currentStreak: number;
+    maxStreak: number;
+    correctAnswers: number;
+    totalAnswers: number;
+    accuracy: number;
+    timestamp: string;
+    achievement?: {
+      type: 'streak' | 'milestone' | 'perfect_streak';
+      value: number;
+      message: string;
+    };
+  }) => void) {
+    return this.supabase
+      .channel('score-updates')
+      .on('broadcast', { event: 'score-updated' }, (payload) => {
+        callback(payload.payload);
+      })
+      .subscribe()
+  }
+
   // Admin/Development functions
   async insertSampleQuestions(): Promise<void> {
     const sampleQuestions = [
