@@ -12,11 +12,13 @@ import { statsData } from "@/components/Stats/statsData";
 import CtaButton from "@/components/CtaButton/CtaButton";
 import LogoBrand from "@/components/LogoBrand/LogoBrand";
 import { useCreateGameSession } from "@/lib/query";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const createGameSession = useCreateGameSession();
 
+  const router = useRouter();
   const handleStartGame = async (
     playerName: string,
     difficulty: string,
@@ -59,20 +61,19 @@ export default function Home() {
                   AI-Powered Trivia
                 </span>
               </h2>
-
               <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
                 Experience the future of trivia gaming with dynamically
                 generated questions, real-time scoring, and intelligent
                 difficulty adaptation. Test your knowledge across multiple
                 categories and compete for the highest scores.
               </p>
-
               {/* CTA Buttons */}
               <CtaButton
                 onStartPlaying={() => setIsModalOpen(true)}
-                onViewDemo={() => console.log("View Demo clicked")}
+                onViewDemo={() => {
+                  router.push("/demo");
+                }}
               />
-
               {/* Stats */}
               <Stats stats={statsData} />
             </div>
