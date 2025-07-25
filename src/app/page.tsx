@@ -13,6 +13,7 @@ import CtaButton from "@/components/CtaButton/CtaButton";
 import LogoBrand from "@/components/LogoBrand/LogoBrand";
 import { useCreateGameSession } from "@/lib/query";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -25,15 +26,14 @@ export default function Home() {
     category: string
   ) => {
     try {
-      const sessionData = await createGameSession.mutateAsync({
+      await createGameSession.mutateAsync({
         playerId: playerName,
         difficulty: difficulty as "easy" | "medium" | "hard",
         category: category || "any",
       });
 
-      // TODO: Navigate to game page once it's implemented
-      console.log("Game session created:", sessionData);
-      alert(`Game session created! Session ID: ${sessionData.session.id}`);
+      // Navigate to game page
+      router.push("/game");
       setIsModalOpen(false);
     } catch (error) {
       console.error("Error starting game:", error);
@@ -86,6 +86,60 @@ export default function Home() {
 
       {/* How it works Section */}
       <HowItWorksSection />
+
+      {/* Demo Links Section */}
+      <div className="bg-gray-50 dark:bg-gray-800 py-16">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-200 mb-6">
+            Explore the Features
+          </h2>
+          <p className="text-lg text-gray-600 dark:text-gray-300 mb-8">
+            Check out our interactive demos to see the AI Trivia Arena in action
+          </p>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            <Link
+              href="/demo"
+              className="bg-white dark:bg-gray-700 p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow border border-gray-200 dark:border-gray-600 group"
+            >
+              <div className="text-4xl mb-4">🎯</div>
+              <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                Question Demo
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300 text-sm">
+                Experience the interactive question cards and answer selection
+              </p>
+            </Link>
+
+            <Link
+              href="/scoreboard-demo"
+              className="bg-white dark:bg-gray-700 p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow border border-gray-200 dark:border-gray-600 group"
+            >
+              <div className="text-4xl mb-4">📊</div>
+              <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                Live Scoreboard
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300 text-sm">
+                See real-time score updates and statistics tracking in action
+              </p>
+            </Link>
+
+            <Link
+              href="/game"
+              className="bg-gradient-to-br from-blue-500 to-purple-600 p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow group"
+            >
+              <div className="text-4xl mb-4">🚀</div>
+              <h3 className="text-xl font-semibold text-white mb-2">
+                Full Game
+              </h3>
+              <p className="text-blue-100 text-sm">
+                Jump straight into the complete AI trivia experience
+              </p>
+            </Link>
+          </div>
+        </div>
+      </div>
+
       {/* Call to Action Section */}
       <CallToActionSection setIsModalOpen={setIsModalOpen} />
       {/* Footer */}

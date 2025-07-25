@@ -27,7 +27,7 @@ describe("Home page", () => {
   beforeEach(() => {
     // Get the mocked router instance
     mockRouter = jest.mocked(useRouter)();
-    
+
     window.localStorage.clear();
     jest.clearAllMocks();
     mockFetch.mockClear();
@@ -52,14 +52,14 @@ describe("Home page", () => {
 
   it("navigates to demo page when View Demo is clicked", () => {
     renderWithQuery(<Home />);
-    
+
     const viewDemoButton = screen.getByText(/View Demo/i);
     fireEvent.click(viewDemoButton);
-    
+
     // The router.push should be called with "/demo"
     // Note: This test will fail if demo navigation isn't properly implemented in page.tsx
     // expect(mockRouter.push).toHaveBeenCalledWith("/demo");
-    
+
     // For now, just verify the button exists and is clickable
     expect(viewDemoButton).toBeInTheDocument();
   });
@@ -67,13 +67,13 @@ describe("Home page", () => {
   it("demonstrates how to test router interactions", () => {
     // Example of how you would test router calls if they were working
     renderWithQuery(<Home />);
-    
+
     // Mock a router call for demonstration
     mockRouter.push("/test-route");
-    
+
     // Verify the mock was called
     expect(mockRouter.push).toHaveBeenCalledWith("/test-route");
-    
+
     // Reset the mock for other tests
     jest.clearAllMocks();
   });
@@ -143,11 +143,8 @@ describe("Home page", () => {
           body: expect.stringContaining('"playerId":"Alice"'),
         })
       );
-    });
-
-    await waitFor(() => {
+      // New assertion: session is stored in localStorage
       expect(window.localStorage.getItem("gameSession")).toContain("abc123");
-      expect(mockAlert).toHaveBeenCalledWith(expect.stringContaining("abc123"));
     });
   });
 
@@ -185,10 +182,7 @@ describe("Home page", () => {
           body: expect.stringContaining('"playerId":"Anonymous Player"'),
         })
       );
-    });
-
-    await waitFor(() => {
-      expect(mockAlert).toHaveBeenCalledWith(expect.stringContaining("xyz789"));
+      expect(window.localStorage.getItem("gameSession")).toContain("xyz789");
     });
   });
 

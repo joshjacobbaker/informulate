@@ -12,6 +12,7 @@ export { default as FeaturesSection } from './FeaturesSection/FeaturesSection';
 export { default as Stats } from './Stats/Stats';
 export { default as CtaButton } from './CtaButton/CtaButton';
 export { default as LogoBrand } from './LogoBrand/LogoBrand';
+export { default as LiveScoreboard } from './LiveScoreboard/LiveScoreboard';
 
 // Type exports
 export type { QuestionData, QuestionCardProps } from './QuestionCard';
