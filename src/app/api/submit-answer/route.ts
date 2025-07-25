@@ -4,6 +4,62 @@ import { openAIService } from '@/lib/openai'
 import { ApiErrorHandler, withErrorHandling } from '@/lib/utils/error-handling'
 import type { Database } from '@/lib/supabase/types'
 
+// Helper function to check for score achievements
+function checkForAchievements(oldSession: { score: number; current_streak: number; total_answers: number; correct_answers: number }, scoreUpdate: { newScore: number; currentStreak: number; totalAnswers: number; accuracy: number }) {
+  // Streak achievements
+  if (scoreUpdate.currentStreak > oldSession.current_streak) {
+    if (scoreUpdate.currentStreak === 5) {
+      return {
+        type: 'streak' as const,
+        value: 5,
+        message: '🔥 5 in a Row! You\'re on fire!'
+      }
+    }
+    if (scoreUpdate.currentStreak === 10) {
+      return {
+        type: 'streak' as const,
+        value: 10,
+        message: '⚡ 10 Streak! Unstoppable!'
+      }
+    }
+    if (scoreUpdate.currentStreak === 20) {
+      return {
+        type: 'streak' as const,
+        value: 20,
+        message: '🌟 20 Streak! Legendary!'
+      }
+    }
+  }
+
+  // Score milestones
+  if (scoreUpdate.newScore >= 1000 && oldSession.score < 1000) {
+    return {
+      type: 'milestone' as const,
+      value: 1000,
+      message: '🎯 1,000 Points! Excellent work!'
+    }
+  }
+  if (scoreUpdate.newScore >= 5000 && oldSession.score < 5000) {
+    return {
+      type: 'milestone' as const,
+      value: 5000,
+      message: '🏆 5,000 Points! You\'re a champion!'
+    }
+  }
+
+  // Perfect accuracy achievements
+  if (scoreUpdate.totalAnswers >= 10 && scoreUpdate.accuracy === 100 && 
+      (oldSession.total_answers === 0 || (oldSession.correct_answers / oldSession.total_answers) * 100 < 100)) {
+    return {
+      type: 'perfect_streak' as const,
+      value: scoreUpdate.totalAnswers,
+      message: '💯 Perfect Score! Flawless execution!'
+    }
+  }
+
+  return null
+}
+
 export async function POST(request: NextRequest) {
   return withErrorHandling(async () => {
     // Initialize Supabase client with service role for server-side operations
@@ -85,12 +141,15 @@ export async function POST(request: NextRequest) {
       .eq('id', sessionId)
       .single()
 
+    let scoreUpdate = null
     if (currentSession && !sessionError) {
+      const oldScore = currentSession.score
       const newScore = currentSession.score + pointsEarned
       const newTotalAnswers = currentSession.total_answers + 1
       const newCorrectAnswers = currentSession.correct_answers + (isCorrect ? 1 : 0)
       const newCurrentStreak = isCorrect ? currentSession.current_streak + 1 : 0
       const newMaxStreak = Math.max(currentSession.max_streak, newCurrentStreak)
+      const newAccuracy = newTotalAnswers > 0 ? (newCorrectAnswers / newTotalAnswers) * 100 : 0
 
       const { error: updateError } = await supabase
         .from('game_sessions')
@@ -106,6 +165,47 @@ export async function POST(request: NextRequest) {
 
       if (updateError) {
         console.warn('⚠️  Could not update session statistics:', updateError)
+      } else {
+        // Prepare enhanced score update for real-time broadcast
+        scoreUpdate = {
+          sessionId,
+          oldScore,
+          newScore,
+          pointsEarned,
+          isCorrect,
+          currentStreak: newCurrentStreak,
+          maxStreak: newMaxStreak,
+          correctAnswers: newCorrectAnswers,
+          totalAnswers: newTotalAnswers,
+          accuracy: newAccuracy,
+          timestamp: new Date().toISOString(),
+          achievement: undefined as { type: 'streak' | 'milestone' | 'perfect_streak'; value: number; message: string } | undefined, // Will be set if achievement found
+        }
+
+        // Check for achievements
+        const achievement = checkForAchievements(currentSession, {
+          newScore,
+          currentStreak: newCurrentStreak,
+          totalAnswers: newTotalAnswers,
+          accuracy: newAccuracy,
+        })
+        if (achievement) {
+          scoreUpdate.achievement = achievement
+        }
+
+        // Send real-time score update broadcast
+        try {
+          await supabase
+            .channel('score-updates')
+            .send({
+              type: 'broadcast',
+              event: 'score-updated',
+              payload: scoreUpdate
+            })
+          console.log('📊 Score update broadcasted:', scoreUpdate)
+        } catch (scoreRealtimeError) {
+          console.warn('⚠️  Could not send score realtime update:', scoreRealtimeError)
+        }
       }
     }
 
