@@ -5,6 +5,7 @@ import {
   useGenerateQuestion, 
   useSubmitAnswer, 
   useCurrentQuestion,
+  useQuestionRealtime,
   GenerateQuestionRequest 
 } from '@/lib/query';
 
@@ -32,6 +33,9 @@ const GameQuestion: React.FC<GameQuestionProps> = ({
   const generateQuestionMutation = useGenerateQuestion();
   const submitAnswerMutation = useSubmitAnswer();
   const { data: currentQuestion } = useCurrentQuestion(sessionId);
+  
+  // Set up real-time subscriptions for question updates
+  useQuestionRealtime(sessionId);
 
   const handleSubmitAnswer = useCallback(async (answer: string = selectedAnswer) => {
     if (!currentQuestion || isSubmitted) return;
