@@ -125,19 +125,6 @@ export default function Home() {
             </Link>
 
             <Link
-              href="/enhanced-game"
-              className="bg-gradient-to-br from-green-500 to-blue-600 p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow group"
-            >
-              <div className="text-4xl mb-4">🎮</div>
-              <h3 className="text-xl font-semibold text-white mb-2">
-                Enhanced Game
-              </h3>
-              <p className="text-green-100 text-sm">
-                Full game flow with state management and endless questions
-              </p>
-            </Link>
-
-            <Link
               href="/game"
               className="bg-gradient-to-br from-blue-500 to-purple-600 p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow group"
             >
