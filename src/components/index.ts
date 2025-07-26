@@ -1,7 +1,6 @@
 // Main component exports
 export { default as QuestionCard } from './QuestionCard';
 export { default as GameQuestion } from './GameQuestion';
-export { default as EnhancedGameQuestion } from './EnhancedGameQuestion';
 export { default as AnswerButton } from './AnswerButton';
 export { default as MultipleChoiceGroup } from './MultipleChoiceGroup';
 export { default as ExplanationPanel } from './ExplanationPanel';
