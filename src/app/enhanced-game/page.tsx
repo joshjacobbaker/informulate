@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import EnhancedGameQuestion from '@/components/EnhancedGameQuestion';
-import { LiveScoreboard } from '@/components';
-import { useCreateGameSession } from '@/lib/query/gameSessionQuery';
-import { useGameState, useGameStats } from '@/lib/stores/gameStore';
-import { useGameFlow } from '@/lib/stores/gameFlow';
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import EnhancedGameQuestion from "@/components/EnhancedGameQuestion";
+import { LiveScoreboard } from "@/components";
+import { useCreateGameSession } from "@/lib/query/gameSessionQuery";
+import { useGameState, useGameStats, useGameConfig, useGameStore } from "@/lib/stores/gameStore/gameStore";
+import { useGameFlow } from "@/lib/stores/gameFlow/gameFlow";
 
 export default function EnhancedGamePage() {
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -17,11 +17,15 @@ export default function EnhancedGamePage() {
   const createGameSession = useCreateGameSession();
   const gameState = useGameState();
   const gameStats = useGameStats();
+  const gameConfig = useGameConfig();
+  const storePlayerId = useGameStore((state) => state.playerId);
+  const updateConfig = useGameStore((state) => state.updateConfig);
+  const initializeGame = useGameStore((state) => state.initializeGame);
   const gameFlow = useGameFlow();
 
   // Check for existing session in localStorage on mount
   useEffect(() => {
-    const storedSession = localStorage.getItem('gameSession');
+    const storedSession = localStorage.getItem("gameSession");
     if (storedSession) {
       try {
         const session = JSON.parse(storedSession);
@@ -29,33 +33,39 @@ export default function EnhancedGamePage() {
         setPlayerId(session.playerId || `player-${Date.now()}`);
         setIsInitialized(true);
       } catch (error) {
-        console.error('Error parsing stored session:', error);
-        localStorage.removeItem('gameSession');
+        console.error("Error parsing stored session:", error);
+        localStorage.removeItem("gameSession");
       }
     }
   }, []);
 
   const startNewGame = async () => {
     try {
-      const newPlayerId = `player-${Date.now()}`;
+      const playerId = storePlayerId || `player-${Date.now()}`;
       const result = await createGameSession.mutateAsync({
-        playerId: newPlayerId,
-        difficulty: 'medium',
-        category: 'any',
+        playerId: playerId,
+        difficulty: gameConfig.difficulty,
+        category: gameConfig.category,
       });
 
+      // Initialize the Zustand store with the session and current config
+      initializeGame(result.session.id, playerId, gameConfig);
+
       setSessionId(result.session.id);
-      setPlayerId(newPlayerId);
+      setPlayerId(playerId);
       setIsInitialized(true);
 
       // Store session data
-      localStorage.setItem('gameSession', JSON.stringify({
-        id: result.session.id,
-        playerId: newPlayerId,
-      }));
+      localStorage.setItem(
+        "gameSession",
+        JSON.stringify({
+          id: result.session.id,
+          playerId: playerId,
+        })
+      );
     } catch (error) {
-      console.error('Error starting game:', error);
-      alert('Failed to start game. Please try again.');
+      console.error("Error starting game:", error);
+      alert("Failed to start game. Please try again.");
     }
   };
 
@@ -64,12 +74,12 @@ export default function EnhancedGamePage() {
   };
 
   const handleQuestionComplete = () => {
-    console.log('Question completed!');
+    console.log("Question completed!");
   };
 
   const handleGameEnd = () => {
-    console.log('Game ended!');
-    localStorage.removeItem('gameSession');
+    console.log("Game ended!");
+    localStorage.removeItem("gameSession");
     setSessionId(null);
     setPlayerId(null);
     setIsInitialized(false);
@@ -104,8 +114,8 @@ export default function EnhancedGamePage() {
                 🎯 Enhanced AI Trivia Arena
               </h1>
               <p className="text-gray-600 dark:text-gray-300 mb-8">
-                Experience the complete game flow with advanced state management, 
-                endless question loops, and real-time scoring!
+                Experience the complete game flow with advanced state
+                management, endless question loops, and real-time scoring!
               </p>
 
               <div className="space-y-4 mb-8">
@@ -127,18 +137,72 @@ export default function EnhancedGamePage() {
                 </div>
               </div>
 
+              {/* Game Configuration */}
+              <div className="space-y-6 mb-8">
+                {/* Difficulty Selection */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                    Select Difficulty
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {(["easy", "medium", "hard"] as const).map((level) => (
+                      <button
+                        key={level}
+                        onClick={() => updateConfig({ difficulty: level })}
+                        className={`py-2 px-3 rounded-lg text-sm font-medium transition-all duration-200 ${
+                          gameConfig.difficulty === level
+                            ? "bg-blue-600 text-white shadow-md"
+                            : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                        }`}
+                      >
+                        {level.charAt(0).toUpperCase() + level.slice(1)}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Category Selection */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                    Select Category
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      { value: "any", label: "Any Category" },
+                      { value: "science", label: "Science" },
+                      { value: "history", label: "History" },
+                      { value: "sports", label: "Sports" },
+                      { value: "geography", label: "Geography" },
+                      { value: "entertainment", label: "Entertainment" },
+                    ].map((category) => (
+                      <button
+                        key={category.value}
+                        onClick={() => updateConfig({ category: category.value })}
+                        className={`py-2 px-3 rounded-lg text-sm font-medium transition-all duration-200 ${
+                          gameConfig.category === category.value
+                            ? "bg-green-600 text-white shadow-md"
+                            : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                        }`}
+                      >
+                        {category.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
               <button
                 onClick={startNewGame}
                 disabled={createGameSession.isPending}
                 className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 disabled:scale-100 disabled:cursor-not-allowed"
               >
                 {createGameSession.isPending
-                  ? 'Starting Game...'
-                  : 'Start Enhanced Game'}
+                  ? "Starting Game..."
+                  : "Start Enhanced Game"}
               </button>
 
               <button
-                onClick={() => router.push('/')}
+                onClick={() => router.push("/")}
                 className="w-full mt-4 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 font-medium py-2 px-4 transition-colors"
               >
                 Back to Home
@@ -165,7 +229,7 @@ export default function EnhancedGamePage() {
           </div>
 
           <div className="flex space-x-3">
-            {gameState === 'paused' ? (
+            {gameState === "paused" ? (
               <button
                 onClick={resumeGame}
                 className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
@@ -196,7 +260,7 @@ export default function EnhancedGamePage() {
         </div>
 
         {/* Game State Indicator */}
-        {gameState === 'paused' && (
+        {gameState === "paused" && (
           <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mb-6">
             <div className="flex items-center justify-center space-x-2">
               <span className="text-2xl">⏸️</span>
@@ -240,33 +304,47 @@ export default function EnhancedGamePage() {
               </h3>
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">Status:</span>
-                  <span className={`font-medium ${
-                    gameState === 'playing' 
-                      ? 'text-green-600 dark:text-green-400' 
-                      : gameState === 'paused'
-                      ? 'text-yellow-600 dark:text-yellow-400'
-                      : 'text-gray-600 dark:text-gray-400'
-                  }`}>
-                    {gameState === 'playing' ? '🟢 Playing' : 
-                     gameState === 'paused' ? '🟡 Paused' : 
-                     gameState === 'ended' ? '🔴 Ended' : '⚪ Idle'}
+                  <span className="text-gray-600 dark:text-gray-400">
+                    Status:
+                  </span>
+                  <span
+                    className={`font-medium ${
+                      gameState === "playing"
+                        ? "text-green-600 dark:text-green-400"
+                        : gameState === "paused"
+                        ? "text-yellow-600 dark:text-yellow-400"
+                        : "text-gray-600 dark:text-gray-400"
+                    }`}
+                  >
+                    {gameState === "playing"
+                      ? "🟢 Playing"
+                      : gameState === "paused"
+                      ? "🟡 Paused"
+                      : gameState === "ended"
+                      ? "🔴 Ended"
+                      : "⚪ Idle"}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">Questions:</span>
+                  <span className="text-gray-600 dark:text-gray-400">
+                    Questions:
+                  </span>
                   <span className="font-medium text-blue-600 dark:text-blue-400">
                     {gameStats.questionsAnswered}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">Accuracy:</span>
+                  <span className="text-gray-600 dark:text-gray-400">
+                    Accuracy:
+                  </span>
                   <span className="font-medium text-green-600 dark:text-green-400">
                     {gameStats.accuracy.toFixed(1)}%
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">Best Streak:</span>
+                  <span className="text-gray-600 dark:text-gray-400">
+                    Best Streak:
+                  </span>
                   <span className="font-medium text-orange-600 dark:text-orange-400">
                     {gameStats.maxStreak}
                   </span>
@@ -282,31 +360,45 @@ export default function EnhancedGamePage() {
               <div className="space-y-3 text-sm">
                 <div className="flex items-center space-x-2">
                   <span className="text-green-500">✓</span>
-                  <span className="text-gray-600 dark:text-gray-400">Game state management</span>
+                  <span className="text-gray-600 dark:text-gray-400">
+                    Game state management
+                  </span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <span className="text-green-500">✓</span>
-                  <span className="text-gray-600 dark:text-gray-400">Endless question loop</span>
+                  <span className="text-gray-600 dark:text-gray-400">
+                    Endless question loop
+                  </span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <span className="text-green-500">✓</span>
-                  <span className="text-gray-600 dark:text-gray-400">Auto-advance questions</span>
+                  <span className="text-gray-600 dark:text-gray-400">
+                    Manual next question
+                  </span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <span className="text-green-500">✓</span>
-                  <span className="text-gray-600 dark:text-gray-400">Achievement system</span>
+                  <span className="text-gray-600 dark:text-gray-400">
+                    Achievement system
+                  </span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <span className="text-green-500">✓</span>
-                  <span className="text-gray-600 dark:text-gray-400">Pause/resume game</span>
+                  <span className="text-gray-600 dark:text-gray-400">
+                    Pause/resume game
+                  </span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <span className="text-green-500">✓</span>
-                  <span className="text-gray-600 dark:text-gray-400">Timer with auto-submit</span>
+                  <span className="text-gray-600 dark:text-gray-400">
+                    Timer with auto-submit
+                  </span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <span className="text-green-500">✓</span>
-                  <span className="text-gray-600 dark:text-gray-400">Real-time statistics</span>
+                  <span className="text-gray-600 dark:text-gray-400">
+                    Real-time statistics
+                  </span>
                 </div>
               </div>
             </div>

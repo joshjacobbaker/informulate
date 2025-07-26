@@ -33,12 +33,21 @@ export interface SubmitAnswerRequest {
 
 export interface SubmitAnswerResponse {
   success: boolean;
-  isCorrect: boolean;
-  correctAnswer: string;
-  pointsEarned: number;
-  explanation?: TriviaExplanation | string; // Can be rich explanation object or simple string
-  newScore: number;
-  streak: number;
+  result: {
+    isCorrect: boolean;
+    correctAnswer: string;
+    pointsEarned: number;
+    explanation?: TriviaExplanation | string; // Can be rich explanation object or simple string
+    newScore: number;
+    streak: number;
+    questionDetails: {
+      id: string;
+      question: string;
+      options: string[];
+      category: string;
+      difficulty: string;
+    };
+  };
   timestamp: string;
 }
 
@@ -118,10 +127,8 @@ export function useSubmitAnswer() {
         queryKey: ['gameSessions', 'session', variables.sessionId],
       });
       
-      // Clear current question since it's been answered
-      queryClient.removeQueries({
-        queryKey: questionKeys.currentQuestion(variables.sessionId),
-      });
+      // Note: Removed automatic current question clearing to prevent auto-advancement
+      // Current question will only be cleared when user clicks "Next Question"
     },
     onError: (error) => {
       console.error('Error submitting answer:', error);

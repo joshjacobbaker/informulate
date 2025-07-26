@@ -1,8 +1,8 @@
 'use client';
 
 import { renderHook, act } from '@testing-library/react';
-import { useGameFlow } from '@/lib/stores/gameFlow';
-import { useGameStore } from '@/lib/stores/gameStore';
+import { useGameFlow } from '@/lib/stores/gameFlow/gameFlow';
+import { useGameStore } from '@/lib/stores/gameStore/gameStore';
 
 // Mock the query hooks with proper async handling
 const mockGenerateQuestion = jest.fn();
@@ -43,10 +43,12 @@ describe('Game Flow Integration', () => {
     });
     
     mockSubmitAnswer.mockResolvedValue({
-      isCorrect: true,
-      correctAnswer: 'B',
-      pointsEarned: 10,
-      explanation: 'Basic addition: 2 + 2 = 4',
+      result: {
+        isCorrect: true,
+        correctAnswer: 'B',
+        pointsEarned: 10,
+        explanation: 'Basic addition: 2 + 2 = 4',
+      },
       newScore: 10,
       streak: 1,
       timestamp: new Date().toISOString(),
@@ -199,15 +201,18 @@ describe('Game Flow Integration', () => {
     const { result } = renderHook(() => useGameFlow());
 
     expect(result.current.config.difficulty).toBe('medium');
+    expect(result.current.config.autoAdvance).toBe(false); // Updated: now defaults to false
 
     act(() => {
       result.current.updateGameConfig({
         difficulty: 'hard',
         timePerQuestion: 45,
+        autoAdvance: true, // User can still enable it manually
       });
     });
 
     expect(result.current.config.difficulty).toBe('hard');
     expect(result.current.config.timePerQuestion).toBe(45);
+    expect(result.current.config.autoAdvance).toBe(true);
   });
 });

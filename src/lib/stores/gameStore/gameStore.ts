@@ -9,6 +9,7 @@ export type QuestionState = 'loading' | 'ready' | 'answering' | 'submitted' | 'r
 
 // Game flow configuration
 export interface GameConfig {
+  playerName: string; // Optional player name
   difficulty: 'easy' | 'medium' | 'hard';
   category: string;
   timePerQuestion: number; // seconds
@@ -109,7 +110,10 @@ export interface GameStore {
   
   // Configuration updates
   updateConfig: (config: Partial<GameConfig>) => void;
-  
+  setPlayerName: (config: { playerName: GameConfig['playerName'] }) => void;
+  setDifficulty: (config: { difficulty: GameConfig['difficulty'] }) => void;
+  setCategory: (config: { category: GameConfig['category'] }) => void;
+
   // Error handling
   setError: (error: string | null) => void;
   clearError: () => void;
@@ -122,11 +126,12 @@ export interface GameStore {
 
 // Default configuration
 const defaultConfig: GameConfig = {
+  playerName: '',
   difficulty: 'medium',
   category: 'any',
   timePerQuestion: 60,
   enableExplanations: true,
-  autoAdvance: true,
+  autoAdvance: false,
   autoAdvanceDelay: 3,
 };
 
@@ -162,10 +167,11 @@ export const useGameStore = create<GameStore>()(
       
       // Game lifecycle actions
       initializeGame: (sessionId, playerId, config) => {
+        const currentState = get();
         set({
           sessionId,
           playerId,
-          config: { ...defaultConfig, ...config },
+          config: { ...defaultConfig, ...currentState.config, ...config },
           gameState: 'starting',
           questionState: 'loading',
           stats: { ...defaultStats, startTime: Date.now() },
@@ -260,7 +266,7 @@ export const useGameStore = create<GameStore>()(
             ...state.currentQuestion,
             isSubmitted: true,
           },
-          questionState: 'submitted',
+          questionState: 'reviewing', // Changed from 'submitted' to 'reviewing' to show explanation
           lastResult: result,
         });
         
@@ -293,12 +299,7 @@ export const useGameStore = create<GameStore>()(
           questionHistory: [...state.questionHistory, state.currentQuestion.id],
         });
         
-        // Auto-advance if enabled
-        if (state.config.autoAdvance) {
-          setTimeout(() => {
-            get().nextQuestion();
-          }, state.config.autoAdvanceDelay * 1000);
-        }
+        // Note: Auto-advance removed - users must manually click "Next Question"
       },
       
       nextQuestion: () => {
@@ -326,6 +327,25 @@ export const useGameStore = create<GameStore>()(
             // The actual submission logic should be handled by the component
           }
         }
+      },
+
+      setCategory: (config: { category: GameConfig['category'] }) => {
+        const state = get();
+        set({
+          config: { ...state.config, category: config.category },
+        });
+      },
+      setDifficulty: (config: { difficulty: GameConfig['difficulty'] }) => {
+        const state = get();
+        set({
+          config: { ...state.config, difficulty: config.difficulty },
+        });
+      },
+      setPlayerName: (config: { playerName: GameConfig['playerName'] }) => {
+        const state = get();
+        set({
+          config: { ...state.config, playerName: config.playerName },
+        });
       },
       
       startQuestionTimer: () => {

@@ -2,6 +2,7 @@ import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import GameStartNewGame from "./GameStartNewGame";
 import { useRouter } from "next/navigation";
+import { GameConfig } from "@/lib/stores/gameStore/gameStore";
 
 jest.mock("next/navigation", () => ({
   useRouter: jest.fn(),
@@ -9,10 +10,22 @@ jest.mock("next/navigation", () => ({
 
 describe("GameStartNewGame", () => {
   const pushMock = jest.fn();
+  const mockOnConfigChange = jest.fn();
+  
+  const defaultGameConfig: GameConfig = {
+    playerName: '',
+    difficulty: 'medium',
+    category: 'any',
+    timePerQuestion: 60,
+    enableExplanations: true,
+    autoAdvance: false,
+    autoAdvanceDelay: 3,
+  };
 
   beforeEach(() => {
     (useRouter as jest.Mock).mockReturnValue({ push: pushMock });
     pushMock.mockClear();
+    mockOnConfigChange.mockClear();
   });
 
   it("renders the title and description", () => {
@@ -20,6 +33,8 @@ describe("GameStartNewGame", () => {
       <GameStartNewGame
         startNewGame={jest.fn()}
         createGameSession={{ isPending: false }}
+        gameConfig={defaultGameConfig}
+        onConfigChange={mockOnConfigChange}
       />
     );
     expect(screen.getByText("AI Trivia Arena")).toBeInTheDocument();
@@ -35,6 +50,8 @@ describe("GameStartNewGame", () => {
       <GameStartNewGame
         startNewGame={jest.fn()}
         createGameSession={{ isPending: false }}
+        gameConfig={defaultGameConfig}
+        onConfigChange={mockOnConfigChange}
       />
     );
     const button = screen.getByRole("button", { name: /Start New Game/i });
@@ -47,6 +64,8 @@ describe("GameStartNewGame", () => {
       <GameStartNewGame
         startNewGame={jest.fn()}
         createGameSession={{ isPending: true }}
+        gameConfig={defaultGameConfig}
+        onConfigChange={mockOnConfigChange}
       />
     );
     const button = screen.getByRole("button", { name: /Starting Game.../i });
@@ -60,6 +79,8 @@ describe("GameStartNewGame", () => {
       <GameStartNewGame
         startNewGame={startNewGameMock}
         createGameSession={{ isPending: false }}
+        gameConfig={defaultGameConfig}
+        onConfigChange={mockOnConfigChange}
       />
     );
     const button = screen.getByRole("button", { name: /Start New Game/i });
@@ -73,6 +94,8 @@ describe("GameStartNewGame", () => {
       <GameStartNewGame
         startNewGame={startNewGameMock}
         createGameSession={{ isPending: true }}
+        gameConfig={defaultGameConfig}
+        onConfigChange={mockOnConfigChange}
       />
     );
     const button = screen.getByRole("button", { name: /Starting Game.../i });
@@ -85,6 +108,8 @@ describe("GameStartNewGame", () => {
       <GameStartNewGame
         startNewGame={jest.fn()}
         createGameSession={{ isPending: false }}
+        gameConfig={defaultGameConfig}
+        onConfigChange={mockOnConfigChange}
       />
     );
     const backButton = screen.getByRole("button", { name: /Back to Home/i });

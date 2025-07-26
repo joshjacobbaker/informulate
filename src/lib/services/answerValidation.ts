@@ -1,6 +1,6 @@
 'use client';
 
-import { AnswerResult } from '@/lib/stores/gameStore';
+import { AnswerResult } from '@/lib/stores/gameStore/gameStore';
 
 // Answer validation and scoring service
 export class AnswerValidationService {
