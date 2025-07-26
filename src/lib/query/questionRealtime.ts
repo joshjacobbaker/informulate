@@ -3,7 +3,7 @@
 import { useEffect, useCallback, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { SupabaseService } from '@/lib/supabase/service';
-import { Question, Answer, QuestionHistory } from '@/lib/supabase/types';
+import { Question } from '@/lib/supabase/types';
 import { questionKeys } from './questionQuery';
 
 // Hook for managing real-time question updates
@@ -15,7 +15,6 @@ export function useQuestionRealtime(sessionId: string | null) {
     if (!sessionId) return;
     
     const newQuestion = payload.new;
-    console.log('Real-time: New question generated (DB)', newQuestion);
 
     // Update current question in cache
     queryClient.setQueryData(
@@ -44,7 +43,6 @@ export function useQuestionRealtime(sessionId: string | null) {
     );
   }, [queryClient, sessionId]);
 
-  // Handle question generation broadcast events (from API)
   const handleQuestionBroadcast = useCallback((payload: {
     sessionId: string;
     question: {
@@ -59,8 +57,6 @@ export function useQuestionRealtime(sessionId: string | null) {
     timestamp: string;
   }) => {
     if (!sessionId || payload.sessionId !== sessionId) return;
-    
-    console.log('Real-time: Question generated broadcast', payload);
 
     // Update current question in cache
     queryClient.setQueryData(
@@ -76,11 +72,8 @@ export function useQuestionRealtime(sessionId: string | null) {
   }, [queryClient, sessionId]);
 
   // Handle answer submissions (which trigger next question generation)
-  const handleAnswerSubmitted = useCallback((payload: { new: Answer }) => {
+  const handleAnswerSubmitted = useCallback(() => {
     if (!sessionId) return;
-    
-    const newAnswer = payload.new;
-    console.log('Real-time: Answer submitted (DB)', newAnswer);
 
     // Invalidate game session queries to refresh scores
     queryClient.invalidateQueries({
@@ -102,7 +95,6 @@ export function useQuestionRealtime(sessionId: string | null) {
   }) => {
     if (!sessionId || payload.sessionId !== sessionId) return;
     
-    console.log('Real-time: Answer submitted broadcast', payload);
 
     // Immediately update the submit answer cache with the result
     queryClient.setQueryData(
@@ -140,11 +132,8 @@ export function useQuestionRealtime(sessionId: string | null) {
   }, [queryClient, sessionId]);
 
   // Handle question history updates (tracks which questions were asked)
-  const handleQuestionAsked = useCallback((payload: { new: QuestionHistory }) => {
+  const handleQuestionAsked = useCallback(() => {
     if (!sessionId) return;
-    
-    const questionHistory = payload.new;
-    console.log('Real-time: Question marked as asked', questionHistory);
 
     // This helps ensure we don't get duplicate questions
     // We can use this to invalidate random question queries
@@ -162,7 +151,6 @@ export function useQuestionRealtime(sessionId: string | null) {
   }) => {
     if (!sessionId || payload.sessionId !== sessionId) return;
     
-    console.log('Real-time: Explanation ready broadcast', payload);
 
     // Trigger a custom event for the UI to pick up
     if (typeof window !== 'undefined') {
@@ -189,7 +177,6 @@ export function useQuestionRealtime(sessionId: string | null) {
   }) => {
     if (!sessionId || payload.sessionId !== sessionId) return;
     
-    console.log('Real-time: Answer complete broadcast', payload);
 
     // Update the submit answer cache with complete result
     queryClient.setQueryData(
@@ -234,11 +221,8 @@ export function useQuestionRealtime(sessionId: string | null) {
     // Subscribe to broadcast events for answer complete
     const answerCompleteSubscription = supabaseService.subscribeToAnswerCompleteBroadcasts(handleAnswerCompleteBroadcast);
 
-    console.log('Real-time subscriptions established for session:', sessionId);
-
     // Cleanup subscriptions
     return () => {
-      console.log('Cleaning up real-time subscriptions for session:', sessionId);
       questionsSubscription.unsubscribe();
       answersSubscription.unsubscribe();
       historySubscription.unsubscribe();
@@ -267,7 +251,6 @@ export function useQuestionNotifications(sessionId: string | null) {
   }) => {
     if (!sessionId || notification.sessionId !== sessionId) return;
 
-    console.log('Notification: New question available', notification);
 
     queryClient.invalidateQueries({
       queryKey: questionKeys.currentQuestion(sessionId),
