@@ -54,7 +54,6 @@ export function useScoreRealtime(sessionId: string | null) {
     if (!sessionId) return;
     
     const updatedSession = payload.new;
-    console.log('Real-time: Score updated (DB)', updatedSession);
 
     const newScoreData: LiveScoreData = {
       score: updatedSession.score,
@@ -127,7 +126,6 @@ export function useScoreRealtime(sessionId: string | null) {
   const handleScoreBroadcast = useCallback((payload: ScoreUpdate) => {
     if (!sessionId || payload.sessionId !== sessionId) return;
     
-    console.log(`[useScoreRealtime] Score broadcast received for session ${sessionId}:`, payload);
 
     const newScoreData: LiveScoreData = {
       score: payload.newScore,
@@ -175,7 +173,6 @@ export function useScoreRealtime(sessionId: string | null) {
   useEffect(() => {
     if (!sessionId) return;
 
-    console.log(`[useScoreRealtime] Setting up subscriptions for session: ${sessionId}`);
     setConnectionStatus('connecting');
     const supabaseService = new SupabaseService();
     
@@ -185,11 +182,8 @@ export function useScoreRealtime(sessionId: string | null) {
     // Subscribe to score broadcast events
     const scoreBroadcastSubscription = supabaseService.subscribeToScoreBroadcasts(handleScoreBroadcast);
 
-    console.log('Real-time score subscriptions established for session:', sessionId);
-
     // Cleanup subscriptions
     return () => {
-      console.log(`[useScoreRealtime] Cleaning up subscriptions for session: ${sessionId}`);
       sessionSubscription.unsubscribe();
       scoreBroadcastSubscription.unsubscribe();
       setConnectionStatus('disconnected');

@@ -42,8 +42,6 @@ export class QuestionGenerationService {
   async generateQuestion(request: QuestionGenerationRequest): Promise<QuestionGenerationResponse> {
     const { sessionId, category, difficulty = 'medium', useAI = true } = request
     
-    console.log(`🎯 Generating question for session: ${sessionId}`)
-    
     try {
       // 1. Try to get an unused question from the database
       const databaseQuestion = await this.getRandomDatabaseQuestion(sessionId, category, difficulty)
@@ -116,12 +114,10 @@ export class QuestionGenerationService {
     }
     
     if (!questions || questions.length === 0) {
-      console.log('📚 No unused database questions found')
       return null
     }
     
     const question = questions[0]
-    console.log('📚 Using existing question from database')
     return {
       id: question.id,
       question: question.question_text,
@@ -136,8 +132,6 @@ export class QuestionGenerationService {
    * Generate a question using AI
    */
   private async generateAIQuestion(sessionId: string, category?: string, difficulty?: 'easy' | 'medium' | 'hard') {
-    console.log('🤖 Generating new question with AI')
-    
     try {
       // Get previously asked questions to avoid duplicates
       const previousQuestions = await this.getPreviousQuestions(sessionId)
@@ -152,8 +146,6 @@ export class QuestionGenerationService {
         console.error('❌ AI question generation failed:', aiResult.error)
         return null
       }
-      
-      console.log('✅ AI question generated successfully')
       
       // Try to save the AI-generated question to the database
       const savedQuestion = await this.saveAIQuestion(aiResult.question, category, difficulty)
@@ -306,7 +298,6 @@ export class QuestionGenerationService {
       }
     ]
     
-    console.log('🔄 Using fallback question')
     return fallbackQuestions[Math.floor(Math.random() * fallbackQuestions.length)]
   }
 }

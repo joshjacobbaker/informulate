@@ -41,27 +41,13 @@ describe("Home page", () => {
     mockConsoleLog.mockRestore();
   });
 
-  it("renders the hero section and CTA buttons", () => {
+  it("renders the hero section and CTA button", () => {
     renderWithQuery(<Home />);
     expect(
       screen.getByRole("heading", { name: "AI Trivia Arena" })
     ).toBeInTheDocument();
     expect(screen.getByText(/Start Playing Now/i)).toBeInTheDocument();
-    expect(screen.getByText(/View Demo/i)).toBeInTheDocument();
-  });
-
-  it("navigates to demo page when View Demo is clicked", () => {
-    renderWithQuery(<Home />);
-
-    const viewDemoButton = screen.getByText(/View Demo/i);
-    fireEvent.click(viewDemoButton);
-
-    // The router.push should be called with "/demo"
-    // Note: This test will fail if demo navigation isn't properly implemented in page.tsx
-    // expect(mockRouter.push).toHaveBeenCalledWith("/demo");
-
-    // For now, just verify the button exists and is clickable
-    expect(viewDemoButton).toBeInTheDocument();
+    expect(screen.queryByText(/View Demo/i)).not.toBeInTheDocument();
   });
 
   it("demonstrates how to test router interactions", () => {

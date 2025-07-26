@@ -70,9 +70,6 @@ export default function Home() {
               {/* CTA Buttons */}
               <CtaButton
                 onStartPlaying={() => setIsModalOpen(true)}
-                onViewDemo={() => {
-                  router.push("/demo");
-                }}
               />
               {/* Stats */}
               <Stats stats={statsData} />
@@ -91,52 +88,13 @@ export default function Home() {
       <div className="bg-gray-50 dark:bg-gray-800 py-16">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-200 mb-6">
-            Explore the Features
+            Ready to Play?
           </h2>
           <p className="text-lg text-gray-600 dark:text-gray-300 mb-8">
-            Check out our interactive demos to see the AI Trivia Arena in action
+            Jump into the AI Trivia Arena and test your knowledge
           </p>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Link
-              href="/demo"
-              className="bg-white dark:bg-gray-700 p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow border border-gray-200 dark:border-gray-600 group"
-            >
-              <div className="text-4xl mb-4">🎯</div>
-              <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400">
-                Question Demo
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300 text-sm">
-                Experience the interactive question cards and answer selection
-              </p>
-            </Link>
-
-            <Link
-              href="/scoreboard-demo"
-              className="bg-white dark:bg-gray-700 p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow border border-gray-200 dark:border-gray-600 group"
-            >
-              <div className="text-4xl mb-4">📊</div>
-              <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400">
-                Live Scoreboard
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300 text-sm">
-                See real-time score updates and statistics tracking in action
-              </p>
-            </Link>
-
-            <Link
-              href="/enhanced-game"
-              className="bg-gradient-to-br from-green-500 to-blue-600 p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow group"
-            >
-              <div className="text-4xl mb-4">🎮</div>
-              <h3 className="text-xl font-semibold text-white mb-2">
-                Enhanced Game
-              </h3>
-              <p className="text-green-100 text-sm">
-                Full game flow with state management and endless questions
-              </p>
-            </Link>
-
+          <div className="grid md:grid-cols-1 lg:grid-cols-1 gap-6 max-w-md mx-auto">
             <Link
               href="/game"
               className="bg-gradient-to-br from-blue-500 to-purple-600 p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow group"

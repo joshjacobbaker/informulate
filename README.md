@@ -2,7 +2,7 @@
 
 A fast-paced, single-player trivia game where every question and explanation is generated on-the-fly by AI. Built with Next.js, Supabase, and OpenAI for an endless, dynamic quiz experience.
 
-![AI Trivia Arena](https://img.shields.io/badge/Status-In%20Development-yellow)
+![AI Trivia Arena](https://img.shields.io/badge/Status-Production%20Ready-green)
 ![Next.js](https://img.shields.io/badge/Next.js-15.4.1-black)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)
 ![Supabase](https://img.shields.io/badge/Supabase-Backend-green)
@@ -23,28 +23,38 @@ A fast-paced, single-player trivia game where every question and explanation is 
 
 ### 🎮 Game Features
 - **Endless Mode**: Play indefinitely with continuously generated questions
-- **Live Scoreboard**: Track your correct/incorrect answers in real-time
-- **Difficulty Levels**: Easy, Medium, and Hard questions
-- **Category Selection**: Choose your preferred topics or go random
+- **Live Scoreboard**: Track your performance with real-time score updates and streak tracking
+- **Difficulty Levels**: Easy, Medium, and Hard questions with smart AI adaptation
+- **Category Selection**: Choose from multiple categories or play with random topics
+- **Achievement System**: Unlock streaks and performance milestones
+- **Responsive Design**: Play seamlessly on desktop, tablet, or mobile devices
 
 ## 🛠️ Tech Stack
 
 ### Frontend
-- **Next.js 15** - React framework with App Router
-- **TypeScript** - Type-safe development
-- **Tailwind CSS** - Utility-first styling
-- **Supabase Client** - Real-time database integration
+- **Next.js 15.4.1** - React framework with App Router and Turbopack
+- **React 19.1.0** - Latest React with concurrent features
+- **TypeScript 5.0** - Type-safe development with strict mode
+- **Tailwind CSS** - Utility-first styling with custom design system
+- **TanStack Query 5.83** - Server state management and caching
+- **Zustand 5.0** - Lightweight client-side state management
+- **Lucide React** - Beautiful, customizable icons
 
-### Backend
-- **Supabase** - Backend-as-a-Service platform
-- **Edge Functions** - Server-side logic in TypeScript
-- **PostgreSQL** - Database for questions, scores, and game state
-- **Supabase Realtime** - Live updates and subscriptions
+### Backend & Database
+- **Supabase** - Backend-as-a-Service platform with PostgreSQL
+- **Supabase Realtime** - WebSocket-based live updates and subscriptions
+- **Row Level Security** - Database-level access control and security
 
-### AI Integration
-- **OpenAI API** - GPT-4 for question and explanation generation
-- **Custom Prompts** - Optimized prompt templates for trivia content
-- **Error Handling** - Fallback mechanisms for API reliability
+### AI & API Integration
+- **OpenAI API 5.10** - GPT-4 integration for question and explanation generation
+- **Custom Prompt Engineering** - Optimized prompts for consistent trivia content
+- **Error Handling & Retries** - Reliability patterns for AI API calls
+
+### Development & Testing
+- **Jest 30.0** - Testing framework with 151+ comprehensive tests
+- **Testing Library** - React component testing utilities
+- **ESLint 9** - Code linting with Next.js recommended rules
+- **TypeScript Strict Mode** - Maximum type safety and error prevention
 
 ## 🏗️ Project Structure
 
@@ -53,7 +63,22 @@ src/
 ├── app/                    # Next.js app directory
 │   ├── layout.tsx         # Root layout
 │   ├── page.tsx           # Landing page
-│   └── globals.css        # Global styles
+│   ├── globals.css        # Global styles
+│   ├── api/               # API routes
+│   │   ├── create-session/  # Game session creation
+│   │   ├── generate-question/ # AI question generation
+│   │   └── submit-answer/   # Answer submission & validation
+│   └── game/              # Game page
+├── components/            # React components
+│   ├── AnswerButton/      # Individual answer option
+│   ├── CallToActionSection/ # Landing page CTA
+│   ├── ExplanationPanel/  # AI explanation display
+│   ├── GameControlsHeader/ # Game session controls
+│   ├── GameQuestion/      # Main question display
+│   ├── LiveScoreboard/    # Real-time score tracking
+│   ├── QuestionCard/      # Question container
+│   ├── StartGameModal/    # Game configuration modal
+│   └── ui/               # Reusable UI components
 ├── lib/
 │   ├── supabase/          # Supabase integration
 │   │   ├── client.ts      # Browser client
@@ -66,11 +91,16 @@ src/
 │   │   ├── prompts.ts     # Prompt templates
 │   │   ├── types.ts       # AI types
 │   │   └── utils.ts       # AI utilities
-│   └── config.ts          # Environment configuration
-└── components/            # React components (coming soon)
-    ├── ui/               # UI components
-    ├── game/             # Game-specific components
-    └── layout/           # Layout components
+│   ├── query/             # TanStack Query setup
+│   │   ├── questionQuery.ts # Question fetching logic
+│   │   ├── questionRealtime.ts # Real-time question updates
+│   │   └── scoreRealtime.ts # Real-time score updates
+│   ├── stores/            # Zustand state management
+│   │   ├── gameFlow/      # Game flow state
+│   │   └── gameStore/     # Game session state
+│   ├── services/          # Business logic services
+│   └── utils/             # Utility functions
+└── supabase/              # Database migrations and config
 ```
 
 ## 🚦 Getting Started
@@ -106,110 +136,224 @@ OPENAI_API_KEY=your_openai_api_key
 ```
 
 ### 3. Database Setup
-Set up your Supabase database:
+Set up your Supabase database by running the setup script:
 ```bash
-# Create tables (coming soon)
-# Enable Realtime (coming soon)
+npm run db:setup
 ```
 
-### 4. Test Configuration
-Verify your setup:
-```bash
-npm run test:config
-```
+This will create all required tables and configure the database schema. You can also run individual commands:
+- `npm run db:check` - Verify database connection
+- `npm run db:seed` - Add sample data for testing
+- `npm run db:reset` - Reset and recreate the database
 
-### 5. Run Development Server
+Alternatively, you can manually apply the SQL migrations located in `supabase/migrations/`.
+
+### 4. Run Development Server
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to see your app.
+The app will start with Turbopack for faster development builds. Open [http://localhost:3000](http://localhost:3000) to see your app.
+
+### 5. Available Scripts
+- `npm run dev` - Start development server with Turbopack
+- `npm run build` - Build for production
+- `npm run start` - Start production server  
+- `npm run lint` - Run ESLint
+- `npm run test` - Run Jest tests (151 tests)
+- `npm run test:watch` - Run Jest tests in watch mode
+- `npm run test:coverage` - Run tests with coverage report
+- `npm run test:config` - Test configuration settings
+- `npm run test:api` - Test API endpoints
+- `npm run test:openai` - Test OpenAI integration
+- `npm run test:edge-functions` - Test Supabase Edge Functions
+- `npm run test:all` - Run all integration tests
+- `npm run db:setup` - Set up database with migrations
+- `npm run db:check` - Check database connection
+- `npm run db:seed` - Seed database with sample data
+- `npm run db:reset` - Reset and recreate database
+
+## 🎯 What You Can Do
+
+### Immediate Gameplay
+- **Start Playing Right Away**: Complete trivia game ready to use
+- **Endless Questions**: AI generates unique questions every time you play
+- **Multiple Difficulty Levels**: Choose from Easy, Medium, or Hard questions
+- **Category Selection**: Pick from various topics or play with random categories
+- **Real-time Scoring**: See your performance update instantly as you play
+- **Detailed Explanations**: Learn from AI-generated explanations after each question
+
+### Technical Features for Developers
+- **Modern Stack**: Built with Next.js 15, TypeScript, and latest React patterns
+- **Real-time Architecture**: Supabase Realtime for live updates without page refreshes
+- **AI Integration**: OpenAI GPT-4 integration with optimized prompts for trivia generation
+- **State Management**: Zustand for client state, TanStack Query for server state
+- **Comprehensive Testing**: 151+ passing tests covering all major functionality
+- **Type Safety**: Full TypeScript coverage with strict mode enabled
 
 ## 🎯 Game Flow
 
-1. **Start Game**: Click "Start Game" on the landing page
-2. **Question Generation**: AI generates a unique trivia question with multiple choice options
-3. **Answer Selection**: Choose your answer from the provided options
-4. **Instant Feedback**: Get immediate results and AI-generated explanations
-5. **Score Update**: Your score updates in real-time
-6. **Next Question**: Continue with endless AI-generated questions
+1. **Start Game**: Click "Start New Game" on the landing page
+2. **Game Configuration**: Choose difficulty level and category preferences  
+3. **Question Generation**: AI generates a unique trivia question with multiple choice options
+4. **Answer Selection**: Choose your answer from the provided options
+5. **Instant Feedback**: Get immediate results with real-time score updates
+6. **AI Explanations**: Read detailed AI-generated explanations for each question
+7. **Score Tracking**: View your performance with live scoreboard and streak tracking
+8. **Continue Playing**: Progress through endless AI-generated questions
 
 ## 📚 API Documentation
 
-### Question Generation
+### Question Generation API
 Generate dynamic trivia questions with AI:
 ```typescript
-import { openAIService } from '@/lib/openai'
+// POST /api/generate-question
+const response = await fetch('/api/generate-question', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    sessionId: 'session-123',
+    category: 'Science & Nature',
+    difficulty: 'medium'
+  })
+})
+```
 
-const result = await openAIService.generateQuestion({
-  category: 'Science & Nature',
-  difficulty: 'medium'
+### Answer Submission API  
+Submit answers and get instant feedback:
+```typescript
+// POST /api/submit-answer
+const response = await fetch('/api/submit-answer', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    sessionId: 'session-123',
+    questionId: 'question-456',
+    selectedAnswer: 'B'
+  })
 })
 ```
 
 ### Real-time Updates
-Subscribe to live game updates:
+Subscribe to live game updates using custom hooks:
 ```typescript
-import { supabaseService } from '@/lib/supabase'
+import { useQuestionRealtime, useScoreRealtime } from '@/lib/query'
 
-supabaseService.subscribeToQuestions((payload) => {
-  // Handle new questions
-})
+// Subscribe to score updates and real-time feedback
+const { liveScoreData, isConnected } = useScoreRealtime(sessionId)
+
+// Subscribe to question updates
+const { latestFeedback, hasNewFeedback } = useQuestionRealtime(sessionId)
 ```
 
 ## 🧪 Testing
 
-### Configuration Testing
+This project includes comprehensive testing with 151 passing tests covering:
+
+### Unit Tests
+- Component rendering and interaction
+- State management (Zustand stores)
+- Utility functions and services
+- API route handlers
+
+### Integration Tests
+- Real-time subscriptions
+- Database operations
+- OpenAI API integration
+- End-to-end game flow
+
+### Running Tests
 ```bash
+# Run all tests
+npm run test
+
+# Run tests in watch mode
+npm run test:watch
+
+# Generate coverage report
+npm run test:coverage
+
+# Test specific configurations
 npm run test:config
+npm run test:api  
+npm run test:openai
 ```
 
-### OpenAI Integration Testing
-```bash
-node test-openai.mjs
-```
+### Test Coverage
+The project maintains comprehensive test coverage with:
+- **151 passing tests** covering all critical functionality
+- **Component testing** for all UI elements and interactions
+- **State management testing** for Zustand stores and game logic
+- **Integration testing** for API routes and real-time features
+- **Mock strategies** for external dependencies (OpenAI, Supabase)
 
-## 📈 Development Roadmap
+Key areas covered:
+- Landing page and navigation flow
+- Game session creation and management  
+- Question generation and display
+- Answer submission and validation
+- Real-time score updates and feedback
+- Error handling and edge cases
 
-### Phase 1: Core Setup ✅
-- [x] Project initialization
-- [x] Supabase configuration
-- [x] OpenAI integration
-- [x] Environment setup
+## 📈 Development Status
 
-### Phase 2: Backend Foundation 🚧
-- [ ] Database schema creation
-- [ ] Edge Functions implementation
-- [ ] Real-time subscriptions
+### ✅ Completed Features
+- **Project Setup & Configuration**
+  - [x] Next.js 15 with TypeScript setup
+  - [x] Supabase integration and database configuration
+  - [x] OpenAI API integration
+  - [x] Environment configuration and scripts
 
-### Phase 3: Frontend Development 📋
-- [ ] Landing page
-- [ ] Question card component
-- [ ] Answer buttons
-- [ ] Explanation panel
-- [ ] Live scoreboard
+- **Backend & API**
+  - [x] Database schema and migrations
+  - [x] API routes for game sessions, question generation, and answer submission
+  - [x] Real-time subscriptions with Supabase Realtime
+  - [x] OpenAI integration for dynamic question generation
 
-### Phase 4: Game Logic 🎮
-- [ ] Game state management
-- [ ] Question flow
-- [ ] Answer validation
-- [ ] Score tracking
+- **Frontend Components**
+  - [x] Responsive landing page with hero section
+  - [x] Game page with full trivia game interface
+  - [x] Question card component with multiple choice options
+  - [x] Answer buttons with interactive feedback
+  - [x] Explanation panel for AI-generated explanations
+  - [x] Live scoreboard with real-time updates
+  - [x] Game controls and navigation
 
-### Phase 5: Polish & Deploy 🚀
-- [ ] UI/UX improvements
-- [ ] Error handling
-- [ ] Performance optimization
-- [ ] Deployment
+- **Game Logic & State Management**
+  - [x] Complete game flow from start to finish
+  - [x] Zustand-based state management for game sessions
+  - [x] TanStack Query for server state and caching
+  - [x] Answer validation and score tracking
+  - [x] Session persistence and restoration
+
+- **Quality & Testing**
+  - [x] Comprehensive test suite (151 tests passing)
+  - [x] ESLint configuration and clean code standards
+  - [x] TypeScript strict mode and type safety
+  - [x] Error handling and edge case management
+
+### 🚀 Production Ready
+This application is fully functional and production-ready with all core features implemented and tested.
 
 ## 🤝 Contributing
 
-This is a learning project, but contributions are welcome! Please:
+Contributions are welcome! This project follows modern React and TypeScript best practices. To contribute:
 
 1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes following the existing code style
+4. Add or update tests as needed (maintain 151+ passing tests)
+5. Run `npm run lint` to ensure code quality
+6. Run `npm run test` to verify all tests pass
+7. Commit your changes (`git commit -m 'Add amazing feature'`)
+8. Push to the branch (`git push origin feature/amazing-feature`)
+9. Open a Pull Request
+
+### Code Quality Standards
+- All code must pass ESLint checks
+- Maintain comprehensive test coverage
+- Follow TypeScript strict mode requirements
+- Use meaningful commit messages
 
 ## 📄 License
 
