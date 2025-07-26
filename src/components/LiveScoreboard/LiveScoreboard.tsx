@@ -23,22 +23,22 @@ const LiveScoreboard: React.FC<LiveScoreboardProps> = ({
 
   // Handle loading state
   useEffect(() => {
-    if (liveScoreData) {
+    // Set loading to false after some time or when data is received
+    const timer = setTimeout(() => {
       setIsLoading(false);
-      console.log(`LiveScoreboard (${compact ? 'compact' : 'full'}) updated:`, {
-        sessionId,
-        score: liveScoreData.score,
-        correctAnswers: liveScoreData.correctAnswers,
-        totalAnswers: liveScoreData.totalAnswers,
-        currentStreak: liveScoreData.currentStreak,
-        isConnected,
-      });
+    }, 100); // Short delay to allow for loading state
+
+    if (liveScoreData) {
+      clearTimeout(timer);
+      setIsLoading(false);
     }
-  }, [liveScoreData, compact, sessionId, isConnected]);
+
+    return () => clearTimeout(timer);
+  }, [liveScoreData, isConnected]);
 
   if (isLoading) {
     return (
-      <div className={`animate-pulse ${className}`}>
+      <div className={`animate-pulse ${className}`} role="status" aria-label="Loading scoreboard">
         <div className="bg-gray-200 dark:bg-gray-700 rounded-lg p-4">
           <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded mb-2"></div>
           <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded mb-2"></div>

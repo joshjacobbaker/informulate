@@ -375,9 +375,6 @@ export const useGameStore = create<GameStore>()(
       // Error handling
       setError: (error) => {
         set({ error });
-        if (error) {
-          console.error('Game error:', error);
-        }
       },
       
       clearError: () => {
