@@ -87,12 +87,6 @@ export function useQuestionRealtime(sessionId: string | null) {
       queryKey: ['gameSessions', 'session', sessionId],
     });
 
-    // Clear current question cache to prepare for next question
-    setTimeout(() => {
-      queryClient.removeQueries({
-        queryKey: questionKeys.currentQuestion(sessionId),
-      });
-    }, 2000); // Give time to show result before clearing
     
   }, [queryClient, sessionId]);
 
@@ -275,10 +269,6 @@ export function useQuestionNotifications(sessionId: string | null) {
 
     console.log('Notification: New question available', notification);
 
-    // Show a notification to the user (this could be a toast, modal, etc.)
-    // For now, we'll just log it and update the cache
-    
-    // Optionally trigger a refetch of the current question
     queryClient.invalidateQueries({
       queryKey: questionKeys.currentQuestion(sessionId),
     });
@@ -314,11 +304,6 @@ export function useAnswerFeedbackRealtime(sessionId: string | null) {
           timestamp: detail.timestamp,
           hasExplanation: !!detail.explanation,
         });
-
-        // Clear the feedback after a delay to reset state
-        setTimeout(() => {
-          setLatestFeedback(null);
-        }, 5000); // Clear after 5 seconds
       }
     };
 

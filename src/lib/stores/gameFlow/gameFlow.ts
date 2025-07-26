@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef } from 'react';
-import { useGameStore, GameConfig, AnswerResult } from './gameStore/gameStore';
+import { useGameStore, GameConfig, AnswerResult } from '../gameStore/gameStore';
 import { 
   useGenerateQuestion, 
   useSubmitAnswer, 
@@ -108,6 +108,9 @@ export const useGameFlow = () => {
       gameStore.updateTimer(newTimeRemaining);
       
       // Auto-submit when time runs out - handled by the component
+      if (newTimeRemaining === 0) {
+        // Timer expired, let the component handle auto-submit
+      }
     }, 1000);
   }, [gameStore]);
 
@@ -387,6 +390,6 @@ export const useGameTimer = () => {
     progress,
     isTimerActive: gameState === 'playing' && !currentQuestion?.isSubmitted,
     isTimeRunningOut: timeRemaining <= 10 && timeRemaining > 0,
-    hasTimeExpired: timeRemaining === 0 && currentQuestion !== null && gameState === 'playing' && !currentQuestion?.isSubmitted,
+    hasTimeExpired: timeRemaining === 0 && currentQuestion !== null && gameState === 'playing',
   };
 };

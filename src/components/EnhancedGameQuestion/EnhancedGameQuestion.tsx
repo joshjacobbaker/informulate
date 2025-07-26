@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import React, { useEffect, useCallback } from 'react';
-import { QuestionCard } from '@/components';
-import { ExplanationPanel } from '@/components';
-import { useGameFlow, useGameTimer } from '@/lib/stores/gameFlow';
-import { useGameStore } from '@/lib/stores/gameStore';
+import React, { useEffect, useCallback } from "react";
+import { QuestionCard } from "@/components";
+import { ExplanationPanel } from "@/components";
+import { useGameFlow, useGameTimer } from "@/lib/stores/gameFlow/gameFlow";
+import { useGameStore } from "@/lib/stores/gameStore/gameStore";
 
 interface EnhancedGameQuestionProps {
   sessionId: string;
@@ -21,7 +21,7 @@ const EnhancedGameQuestion: React.FC<EnhancedGameQuestionProps> = ({
   onScoreUpdate,
   onQuestionComplete,
   onGameEnd,
-  className = '',
+  className = "",
 }) => {
   const gameFlow = useGameFlow();
   const timer = useGameTimer();
@@ -31,11 +31,11 @@ const EnhancedGameQuestion: React.FC<EnhancedGameQuestionProps> = ({
   useEffect(() => {
     if (!gameStore.sessionId && sessionId) {
       gameFlow.startNewGame(playerId, sessionId, {
-        difficulty: 'medium',
-        category: 'any',
+        difficulty: "medium",
+        category: "any",
         timePerQuestion: 60,
         enableExplanations: true,
-        autoAdvance: true,
+        autoAdvance: false,
         autoAdvanceDelay: 3,
       });
     }
@@ -43,8 +43,13 @@ const EnhancedGameQuestion: React.FC<EnhancedGameQuestionProps> = ({
 
   // Handle auto-submit when timer expires
   useEffect(() => {
-    if (timer.hasTimeExpired && timer.isTimerActive && gameFlow.currentQuestion && !gameFlow.currentQuestion.isSubmitted) {
-      gameFlow.submitAnswer(''); // Submit empty answer on timeout
+    if (
+      timer.hasTimeExpired &&
+      timer.isTimerActive &&
+      gameFlow.currentQuestion &&
+      !gameFlow.currentQuestion.isSubmitted
+    ) {
+      gameFlow.submitAnswer(""); // Submit empty answer on timeout
     }
   }, [timer.hasTimeExpired, timer.isTimerActive, gameFlow]);
 
@@ -64,14 +69,17 @@ const EnhancedGameQuestion: React.FC<EnhancedGameQuestionProps> = ({
 
   // Callback for game end
   useEffect(() => {
-    if (gameFlow.gameState === 'ended' && onGameEnd) {
+    if (gameFlow.gameState === "ended" && onGameEnd) {
       onGameEnd();
     }
   }, [gameFlow.gameState, onGameEnd]);
 
-  const handleAnswerSelect = useCallback((answer: string) => {
-    gameFlow.selectAnswer(answer);
-  }, [gameFlow]);
+  const handleAnswerSelect = useCallback(
+    (answer: string) => {
+      gameFlow.selectAnswer(answer);
+    },
+    [gameFlow]
+  );
 
   const handleSubmitAnswer = useCallback(async () => {
     if (gameFlow.canSubmit) {
@@ -84,14 +92,19 @@ const EnhancedGameQuestion: React.FC<EnhancedGameQuestionProps> = ({
   }, [gameFlow]);
 
   // Convert game store question to QuestionCard format
-  const questionData = gameFlow.currentQuestion ? {
-    id: gameFlow.currentQuestion.id,
-    question: gameFlow.currentQuestion.question,
-    options: gameFlow.currentQuestion.options,
-    correctAnswer: gameFlow.currentQuestion.correctAnswer,
-    category: gameFlow.currentQuestion.category,
-    difficulty: gameFlow.currentQuestion.difficulty as 'easy' | 'medium' | 'hard',
-  } : null;
+  const questionData = gameFlow.currentQuestion
+    ? {
+        id: gameFlow.currentQuestion.id,
+        question: gameFlow.currentQuestion.question,
+        options: gameFlow.currentQuestion.options,
+        correctAnswer: gameFlow.currentQuestion.correctAnswer,
+        category: gameFlow.currentQuestion.category,
+        difficulty: gameFlow.currentQuestion.difficulty as
+          | "easy"
+          | "medium"
+          | "hard",
+      }
+    : null;
 
   // Loading state
   if (gameFlow.isLoading || !questionData) {
@@ -103,7 +116,10 @@ const EnhancedGameQuestion: React.FC<EnhancedGameQuestionProps> = ({
             <div className="h-6 bg-gray-300 dark:bg-gray-600 rounded mb-6"></div>
             <div className="space-y-3">
               {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="h-12 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
+                <div
+                  key={i}
+                  className="h-12 bg-gray-200 dark:bg-gray-700 rounded-lg"
+                ></div>
               ))}
             </div>
           </div>
@@ -121,7 +137,7 @@ const EnhancedGameQuestion: React.FC<EnhancedGameQuestionProps> = ({
             Game Error
           </h3>
           <p className="text-red-600 dark:text-red-300 mb-4">
-            {gameFlow.error || 'An unexpected error occurred'}
+            {gameFlow.error || "An unexpected error occurred"}
           </p>
           <button
             onClick={() => gameFlow.generateNextQuestion()}
@@ -141,48 +157,56 @@ const EnhancedGameQuestion: React.FC<EnhancedGameQuestionProps> = ({
         <div className="flex justify-between items-center text-sm">
           <div className="flex items-center space-x-4">
             <div>
-              <span className="font-medium text-gray-700 dark:text-gray-300">Question:</span>
+              <span className="font-medium text-gray-700 dark:text-gray-300">
+                Question:
+              </span>
               <span className="ml-1 text-blue-600 dark:text-blue-400 font-bold">
                 #{gameFlow.stats.questionsAnswered + 1}
               </span>
             </div>
             <div>
-              <span className="font-medium text-gray-700 dark:text-gray-300">Score:</span>
+              <span className="font-medium text-gray-700 dark:text-gray-300">
+                Score:
+              </span>
               <span className="ml-1 text-green-600 dark:text-green-400 font-bold">
                 {gameFlow.stats.totalScore}
               </span>
             </div>
             <div>
-              <span className="font-medium text-gray-700 dark:text-gray-300">Streak:</span>
+              <span className="font-medium text-gray-700 dark:text-gray-300">
+                Streak:
+              </span>
               <span className="ml-1 text-orange-600 dark:text-orange-400 font-bold">
                 {gameFlow.stats.currentStreak}
               </span>
             </div>
           </div>
           <div className="flex items-center space-x-2">
-            <div className={`px-3 py-1 rounded-full text-xs font-medium ${
-              timer.isTimeRunningOut 
-                ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300' 
-                : 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
-            }`}>
+            <div
+              className={`px-3 py-1 rounded-full text-xs font-medium ${
+                timer.isTimeRunningOut
+                  ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300"
+                  : "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300"
+              }`}
+            >
               ⏱️ {timer.timeRemainingFormatted}
             </div>
-            <div className={`w-2 h-2 rounded-full ${
-              gameFlow.gameState === 'playing' 
-                ? 'bg-green-500 animate-pulse' 
-                : 'bg-gray-400'
-            }`}></div>
+            <div
+              className={`w-2 h-2 rounded-full ${
+                gameFlow.gameState === "playing"
+                  ? "bg-green-500 animate-pulse"
+                  : "bg-gray-400"
+              }`}
+            ></div>
           </div>
         </div>
-        
+
         {/* Timer Progress Bar */}
         <div className="mt-3">
           <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-            <div 
+            <div
               className={`h-2 rounded-full transition-all duration-1000 ${
-                timer.isTimeRunningOut 
-                  ? 'bg-red-500' 
-                  : 'bg-blue-500'
+                timer.isTimeRunningOut ? "bg-red-500" : "bg-blue-500"
               }`}
               style={{ width: `${timer.progress}%` }}
             ></div>
@@ -197,22 +221,23 @@ const EnhancedGameQuestion: React.FC<EnhancedGameQuestionProps> = ({
         onAnswerSelect={handleAnswerSelect}
         timeRemaining={timer.timeRemaining}
         isSubmitted={gameFlow.currentQuestion?.isSubmitted || false}
-        showCorrectAnswer={gameFlow.questionState === 'reviewing'}
+        showCorrectAnswer={gameFlow.questionState === "reviewing"}
         isLoading={gameFlow.isLoading}
       />
 
       {/* Submit Button */}
-      {!gameFlow.currentQuestion?.isSubmitted && gameFlow.currentQuestion?.selectedAnswer && (
-        <div className="text-center">
-          <button
-            onClick={handleSubmitAnswer}
-            disabled={gameFlow.isLoading || !gameFlow.canSubmit}
-            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-semibold py-3 px-8 rounded-lg transition-all duration-200 transform hover:scale-105 disabled:scale-100 disabled:cursor-not-allowed"
-          >
-            {gameFlow.isLoading ? 'Submitting...' : 'Submit Answer'}
-          </button>
-        </div>
-      )}
+      {!gameFlow.currentQuestion?.isSubmitted &&
+        gameFlow.currentQuestion?.selectedAnswer && (
+          <div className="text-center">
+            <button
+              onClick={handleSubmitAnswer}
+              disabled={gameFlow.isLoading || !gameFlow.canSubmit}
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-semibold py-3 px-8 rounded-lg transition-all duration-200 transform hover:scale-105 disabled:scale-100 disabled:cursor-not-allowed"
+            >
+              {gameFlow.isLoading ? "Submitting..." : "Submit Answer"}
+            </button>
+          </div>
+        )}
 
       {/* Achievement Notification */}
       {gameFlow.lastResult?.achievement && (
@@ -230,7 +255,7 @@ const EnhancedGameQuestion: React.FC<EnhancedGameQuestionProps> = ({
       )}
 
       {/* Answer Result & Explanation */}
-      {gameFlow.lastResult && gameFlow.questionState === 'reviewing' && (
+      {gameFlow.lastResult && gameFlow.questionState === "reviewing" && (
         <div className="space-y-4">
           <ExplanationPanel
             isCorrect={gameFlow.lastResult.isCorrect}
@@ -243,26 +268,15 @@ const EnhancedGameQuestion: React.FC<EnhancedGameQuestionProps> = ({
             animateOnMount={true}
           />
 
-          {/* Manual Next Button (if auto-advance is disabled) */}
-          {!gameFlow.config.autoAdvance && (
-            <div className="text-center">
-              <button
-                onClick={handleNextQuestion}
-                className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-6 rounded-lg transition-colors"
-              >
-                Next Question →
-              </button>
-            </div>
-          )}
-
-          {/* Auto-advance countdown */}
-          {gameFlow.config.autoAdvance && (
-            <div className="text-center">
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Next question in {gameFlow.config.autoAdvanceDelay} seconds...
-              </p>
-            </div>
-          )}
+          {/* Manual Next Button */}
+          <div className="text-center">
+            <button
+              onClick={handleNextQuestion}
+              className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold py-3 px-8 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg"
+            >
+              Next Question →
+            </button>
+          </div>
         </div>
       )}
 
@@ -289,13 +303,17 @@ const EnhancedGameQuestion: React.FC<EnhancedGameQuestionProps> = ({
               <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
                 {gameFlow.stats.maxStreak}
               </div>
-              <div className="text-gray-600 dark:text-gray-400">Best Streak</div>
+              <div className="text-gray-600 dark:text-gray-400">
+                Best Streak
+              </div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
                 {gameFlow.stats.totalScore}
               </div>
-              <div className="text-gray-600 dark:text-gray-400">Total Score</div>
+              <div className="text-gray-600 dark:text-gray-400">
+                Total Score
+              </div>
             </div>
           </div>
         </div>

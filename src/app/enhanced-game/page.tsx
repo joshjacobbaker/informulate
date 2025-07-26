@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import EnhancedGameQuestion from '@/components/EnhancedGameQuestion';
-import { LiveScoreboard } from '@/components';
-import { useCreateGameSession } from '@/lib/query/gameSessionQuery';
-import { useGameState, useGameStats } from '@/lib/stores/gameStore';
-import { useGameFlow } from '@/lib/stores/gameFlow';
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import EnhancedGameQuestion from "@/components/EnhancedGameQuestion";
+import { LiveScoreboard } from "@/components";
+import { useCreateGameSession } from "@/lib/query/gameSessionQuery";
+import { useGameState, useGameStats } from "@/lib/stores/gameStore/gameStore";
+import { useGameFlow } from "@/lib/stores/gameFlow/gameFlow";
 
 export default function EnhancedGamePage() {
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -21,7 +21,7 @@ export default function EnhancedGamePage() {
 
   // Check for existing session in localStorage on mount
   useEffect(() => {
-    const storedSession = localStorage.getItem('gameSession');
+    const storedSession = localStorage.getItem("gameSession");
     if (storedSession) {
       try {
         const session = JSON.parse(storedSession);
@@ -29,8 +29,8 @@ export default function EnhancedGamePage() {
         setPlayerId(session.playerId || `player-${Date.now()}`);
         setIsInitialized(true);
       } catch (error) {
-        console.error('Error parsing stored session:', error);
-        localStorage.removeItem('gameSession');
+        console.error("Error parsing stored session:", error);
+        localStorage.removeItem("gameSession");
       }
     }
   }, []);
@@ -40,8 +40,8 @@ export default function EnhancedGamePage() {
       const newPlayerId = `player-${Date.now()}`;
       const result = await createGameSession.mutateAsync({
         playerId: newPlayerId,
-        difficulty: 'medium',
-        category: 'any',
+        difficulty: "medium",
+        category: "any",
       });
 
       setSessionId(result.session.id);
@@ -49,13 +49,16 @@ export default function EnhancedGamePage() {
       setIsInitialized(true);
 
       // Store session data
-      localStorage.setItem('gameSession', JSON.stringify({
-        id: result.session.id,
-        playerId: newPlayerId,
-      }));
+      localStorage.setItem(
+        "gameSession",
+        JSON.stringify({
+          id: result.session.id,
+          playerId: newPlayerId,
+        })
+      );
     } catch (error) {
-      console.error('Error starting game:', error);
-      alert('Failed to start game. Please try again.');
+      console.error("Error starting game:", error);
+      alert("Failed to start game. Please try again.");
     }
   };
 
@@ -64,12 +67,12 @@ export default function EnhancedGamePage() {
   };
 
   const handleQuestionComplete = () => {
-    console.log('Question completed!');
+    console.log("Question completed!");
   };
 
   const handleGameEnd = () => {
-    console.log('Game ended!');
-    localStorage.removeItem('gameSession');
+    console.log("Game ended!");
+    localStorage.removeItem("gameSession");
     setSessionId(null);
     setPlayerId(null);
     setIsInitialized(false);
@@ -104,8 +107,8 @@ export default function EnhancedGamePage() {
                 🎯 Enhanced AI Trivia Arena
               </h1>
               <p className="text-gray-600 dark:text-gray-300 mb-8">
-                Experience the complete game flow with advanced state management, 
-                endless question loops, and real-time scoring!
+                Experience the complete game flow with advanced state
+                management, endless question loops, and real-time scoring!
               </p>
 
               <div className="space-y-4 mb-8">
@@ -133,12 +136,12 @@ export default function EnhancedGamePage() {
                 className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 disabled:scale-100 disabled:cursor-not-allowed"
               >
                 {createGameSession.isPending
-                  ? 'Starting Game...'
-                  : 'Start Enhanced Game'}
+                  ? "Starting Game..."
+                  : "Start Enhanced Game"}
               </button>
 
               <button
-                onClick={() => router.push('/')}
+                onClick={() => router.push("/")}
                 className="w-full mt-4 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 font-medium py-2 px-4 transition-colors"
               >
                 Back to Home
@@ -165,7 +168,7 @@ export default function EnhancedGamePage() {
           </div>
 
           <div className="flex space-x-3">
-            {gameState === 'paused' ? (
+            {gameState === "paused" ? (
               <button
                 onClick={resumeGame}
                 className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
@@ -196,7 +199,7 @@ export default function EnhancedGamePage() {
         </div>
 
         {/* Game State Indicator */}
-        {gameState === 'paused' && (
+        {gameState === "paused" && (
           <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mb-6">
             <div className="flex items-center justify-center space-x-2">
               <span className="text-2xl">⏸️</span>
@@ -240,33 +243,47 @@ export default function EnhancedGamePage() {
               </h3>
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">Status:</span>
-                  <span className={`font-medium ${
-                    gameState === 'playing' 
-                      ? 'text-green-600 dark:text-green-400' 
-                      : gameState === 'paused'
-                      ? 'text-yellow-600 dark:text-yellow-400'
-                      : 'text-gray-600 dark:text-gray-400'
-                  }`}>
-                    {gameState === 'playing' ? '🟢 Playing' : 
-                     gameState === 'paused' ? '🟡 Paused' : 
-                     gameState === 'ended' ? '🔴 Ended' : '⚪ Idle'}
+                  <span className="text-gray-600 dark:text-gray-400">
+                    Status:
+                  </span>
+                  <span
+                    className={`font-medium ${
+                      gameState === "playing"
+                        ? "text-green-600 dark:text-green-400"
+                        : gameState === "paused"
+                        ? "text-yellow-600 dark:text-yellow-400"
+                        : "text-gray-600 dark:text-gray-400"
+                    }`}
+                  >
+                    {gameState === "playing"
+                      ? "🟢 Playing"
+                      : gameState === "paused"
+                      ? "🟡 Paused"
+                      : gameState === "ended"
+                      ? "🔴 Ended"
+                      : "⚪ Idle"}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">Questions:</span>
+                  <span className="text-gray-600 dark:text-gray-400">
+                    Questions:
+                  </span>
                   <span className="font-medium text-blue-600 dark:text-blue-400">
                     {gameStats.questionsAnswered}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">Accuracy:</span>
+                  <span className="text-gray-600 dark:text-gray-400">
+                    Accuracy:
+                  </span>
                   <span className="font-medium text-green-600 dark:text-green-400">
                     {gameStats.accuracy.toFixed(1)}%
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">Best Streak:</span>
+                  <span className="text-gray-600 dark:text-gray-400">
+                    Best Streak:
+                  </span>
                   <span className="font-medium text-orange-600 dark:text-orange-400">
                     {gameStats.maxStreak}
                   </span>
@@ -282,31 +299,45 @@ export default function EnhancedGamePage() {
               <div className="space-y-3 text-sm">
                 <div className="flex items-center space-x-2">
                   <span className="text-green-500">✓</span>
-                  <span className="text-gray-600 dark:text-gray-400">Game state management</span>
+                  <span className="text-gray-600 dark:text-gray-400">
+                    Game state management
+                  </span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <span className="text-green-500">✓</span>
-                  <span className="text-gray-600 dark:text-gray-400">Endless question loop</span>
+                  <span className="text-gray-600 dark:text-gray-400">
+                    Endless question loop
+                  </span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <span className="text-green-500">✓</span>
-                  <span className="text-gray-600 dark:text-gray-400">Auto-advance questions</span>
+                  <span className="text-gray-600 dark:text-gray-400">
+                    Manual next question
+                  </span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <span className="text-green-500">✓</span>
-                  <span className="text-gray-600 dark:text-gray-400">Achievement system</span>
+                  <span className="text-gray-600 dark:text-gray-400">
+                    Achievement system
+                  </span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <span className="text-green-500">✓</span>
-                  <span className="text-gray-600 dark:text-gray-400">Pause/resume game</span>
+                  <span className="text-gray-600 dark:text-gray-400">
+                    Pause/resume game
+                  </span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <span className="text-green-500">✓</span>
-                  <span className="text-gray-600 dark:text-gray-400">Timer with auto-submit</span>
+                  <span className="text-gray-600 dark:text-gray-400">
+                    Timer with auto-submit
+                  </span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <span className="text-green-500">✓</span>
-                  <span className="text-gray-600 dark:text-gray-400">Real-time statistics</span>
+                  <span className="text-gray-600 dark:text-gray-400">
+                    Real-time statistics
+                  </span>
                 </div>
               </div>
             </div>

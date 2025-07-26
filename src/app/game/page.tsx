@@ -53,12 +53,7 @@ export default function GamePage() {
     console.log(`Score updated: ${newScore}, correct: ${isCorrect}`);
   };
 
-  const handleQuestionComplete = () => {
-    // Auto-generate next question after a delay
-    setTimeout(() => {
-      // The GameQuestion component will automatically generate the next question
-    }, 3000);
-  };
+  const handleQuestionComplete = () => {};
 
   const endGame = useCallback(() => {
     localStorage.removeItem("gameSession");

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import QuestionCard, { QuestionData } from "../QuestionCard";
 import ExplanationPanel from "../ExplanationPanel";
 import {
@@ -8,6 +9,8 @@ import {
   useQuestionRealtime,
   useAnswerFeedbackRealtime,
   GenerateQuestionRequest,
+  SubmitAnswerResponse,
+  questionKeys,
 } from "@/lib/query";
 
 interface GameQuestionProps {
@@ -29,8 +32,10 @@ const GameQuestion: React.FC<GameQuestionProps> = ({
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState<number>(60); // 60 seconds per question
   const [showResult, setShowResult] = useState(false);
+  const [answerResult, setAnswerResult] = useState<SubmitAnswerResponse | null>(null); // Store the answer result locally
 
   // React Query hooks
+  const queryClient = useQueryClient();
   const generateQuestionMutation = useGenerateQuestion();
   const submitAnswerMutation = useSubmitAnswer();
   const { data: currentQuestion } = useCurrentQuestion(sessionId);
@@ -57,30 +62,12 @@ const GameQuestion: React.FC<GameQuestionProps> = ({
         });
 
         setShowResult(true);
+        setAnswerResult(result); // Store the result locally
 
         // Notify parent components
-        onScoreUpdate?.(result.newScore, result.isCorrect);
+        onScoreUpdate?.(result.result.newScore, result.result.isCorrect);
 
-        // Auto-continue after showing result for 3 seconds
-        setTimeout(() => {
-          // Reset state for next question
-          setSelectedAnswer("");
-          setIsSubmitted(false);
-          setTimeRemaining(60);
-          setShowResult(false);
-          clearFeedback(); // Clear real-time feedback
-
-          // Generate next question
-          const request: GenerateQuestionRequest = {
-            sessionId,
-            category,
-            difficulty,
-            useAI: true,
-          };
-          generateQuestionMutation.mutate(request);
-
-          onQuestionComplete?.();
-        }, 3000);
+        // Note: Auto-advance removed - users must manually click "Next Question"
       } catch (error) {
         console.error("Failed to submit answer:", error);
         setIsSubmitted(false); // Allow retry
@@ -94,13 +81,43 @@ const GameQuestion: React.FC<GameQuestionProps> = ({
       sessionId,
       submitAnswerMutation,
       onScoreUpdate,
-      category,
-      difficulty,
-      generateQuestionMutation,
-      onQuestionComplete,
-      clearFeedback, // Add to dependencies
     ]
   );
+
+  // Manual next question handler
+  const handleNextQuestion = useCallback(() => {
+    // Clear current question cache to prepare for next question
+    queryClient.removeQueries({
+      queryKey: questionKeys.currentQuestion(sessionId),
+    });
+
+    // Reset state for next question
+    setSelectedAnswer("");
+    setIsSubmitted(false);
+    setTimeRemaining(60);
+    setShowResult(false);
+    setAnswerResult(null); // Clear the stored result
+    clearFeedback(); // Clear real-time feedback
+
+    // Generate next question
+    const request: GenerateQuestionRequest = {
+      sessionId,
+      category,
+      difficulty,
+      useAI: true,
+    };
+    generateQuestionMutation.mutate(request);
+
+    onQuestionComplete?.();
+  }, [
+    sessionId,
+    category,
+    difficulty,
+    generateQuestionMutation,
+    onQuestionComplete,
+    clearFeedback,
+    queryClient,
+  ]);
 
   // Timer effect
   useEffect(() => {
@@ -293,18 +310,29 @@ const GameQuestion: React.FC<GameQuestionProps> = ({
       )}
 
       {/* Full Result Display - Shows complete explanation after API completes */}
-      {showResult && submitAnswerMutation.data && (
-        <div className="mt-6">
+      {showResult && answerResult?.result && (
+        <div className="mt-6 space-y-4">
           <ExplanationPanel
-            isCorrect={submitAnswerMutation.data.isCorrect}
-            correctAnswer={submitAnswerMutation.data.correctAnswer}
+            isCorrect={answerResult.result.isCorrect}
+            correctAnswer={answerResult.result.correctAnswer}
             userAnswer={selectedAnswer}
-            explanation={submitAnswerMutation.data.explanation}
-            pointsEarned={submitAnswerMutation.data.pointsEarned}
+            explanation={answerResult.result.explanation}
+            pointsEarned={answerResult.result.pointsEarned}
             variant="default"
             showScoreInfo={true}
             animateOnMount={true}
           />
+
+          {/* Manual Next Question Button */}
+          <div className="text-center">
+            <button
+              onClick={handleNextQuestion}
+              disabled={generateQuestionMutation.isPending}
+              className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-semibold py-3 px-8 rounded-lg transition-all duration-200 transform hover:scale-105 disabled:scale-100 disabled:cursor-not-allowed shadow-lg"
+            >
+              {generateQuestionMutation.isPending ? "Loading..." : "Next Question →"}
+            </button>
+          </div>
         </div>
       )}
     </div>

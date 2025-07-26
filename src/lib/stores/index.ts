@@ -1,9 +1,9 @@
 // Game state management exports
-export * from './gameStore';
-export * from './gameFlow';
+export * from './gameStore/gameStore';
+export * from './gameFlow/gameFlow';
 
 // Re-export main hooks for convenience
-export { useGameFlow } from './gameFlow';
+export { useGameFlow } from './gameFlow/gameFlow';
 export { 
   useGameStore, 
   useGameState, 
@@ -13,4 +13,4 @@ export {
   useGameConfig, 
   useLastResult, 
   useGameError 
-} from './gameStore';
+} from './gameStore/gameStore';

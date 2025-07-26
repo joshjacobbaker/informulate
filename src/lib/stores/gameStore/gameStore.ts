@@ -126,7 +126,7 @@ const defaultConfig: GameConfig = {
   category: 'any',
   timePerQuestion: 60,
   enableExplanations: true,
-  autoAdvance: true,
+  autoAdvance: false,
   autoAdvanceDelay: 3,
 };
 
@@ -260,7 +260,7 @@ export const useGameStore = create<GameStore>()(
             ...state.currentQuestion,
             isSubmitted: true,
           },
-          questionState: 'submitted',
+          questionState: 'reviewing', // Changed from 'submitted' to 'reviewing' to show explanation
           lastResult: result,
         });
         
@@ -293,12 +293,7 @@ export const useGameStore = create<GameStore>()(
           questionHistory: [...state.questionHistory, state.currentQuestion.id],
         });
         
-        // Auto-advance if enabled
-        if (state.config.autoAdvance) {
-          setTimeout(() => {
-            get().nextQuestion();
-          }, state.config.autoAdvanceDelay * 1000);
-        }
+        // Note: Auto-advance removed - users must manually click "Next Question"
       },
       
       nextQuestion: () => {
