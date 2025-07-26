@@ -97,7 +97,7 @@ export default function Home() {
             Check out our interactive demos to see the AI Trivia Arena in action
           </p>
 
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             <Link
               href="/demo"
               className="bg-white dark:bg-gray-700 p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow border border-gray-200 dark:border-gray-600 group"
@@ -125,15 +125,28 @@ export default function Home() {
             </Link>
 
             <Link
+              href="/enhanced-game"
+              className="bg-gradient-to-br from-green-500 to-blue-600 p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow group"
+            >
+              <div className="text-4xl mb-4">🎮</div>
+              <h3 className="text-xl font-semibold text-white mb-2">
+                Enhanced Game
+              </h3>
+              <p className="text-green-100 text-sm">
+                Full game flow with state management and endless questions
+              </p>
+            </Link>
+
+            <Link
               href="/game"
               className="bg-gradient-to-br from-blue-500 to-purple-600 p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow group"
             >
               <div className="text-4xl mb-4">🚀</div>
               <h3 className="text-xl font-semibold text-white mb-2">
-                Full Game
+                Classic Game
               </h3>
               <p className="text-blue-100 text-sm">
-                Jump straight into the complete AI trivia experience
+                Original AI trivia experience
               </p>
             </Link>
           </div>
