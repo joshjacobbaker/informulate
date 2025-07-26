@@ -194,14 +194,18 @@ describe('gameStore', () => {
         expect(duration).toBeGreaterThanOrEqual(0);
     });
 
-    it('should persist and rehydrate state', () => {
+    it('should persist and rehydrate state', async () => {
         act(() => {
             useGameStore.getState().initializeGame('persist-session', 'persist-player', { difficulty: 'easy' });
         });
+        
+        // Wait a bit for persistence to complete
+        await new Promise(resolve => setTimeout(resolve, 10));
+        
         // Simulate reload
         const persisted = JSON.parse(localStorage.getItem('game-store') || '{}');
-        expect(persisted.sessionId).toBe('persist-session');
-        expect(persisted.playerId).toBe('persist-player');
-        expect(persisted.config.difficulty).toBe('easy');
+        expect(persisted.state?.sessionId).toBe('persist-session');
+        expect(persisted.state?.playerId).toBe('persist-player');
+        expect(persisted.state?.config?.difficulty).toBe('easy');
     });
 });

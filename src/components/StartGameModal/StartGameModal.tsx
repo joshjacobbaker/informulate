@@ -1,6 +1,6 @@
 import { Play } from "lucide-react";
-import { useState } from "react";
 import { difficulties, categories } from "./StartGameModalData";
+import { useGameStore } from "@/lib/stores/gameStore/gameStore";
 
 interface StartGameModalProps {
   isOpen: boolean;
@@ -17,9 +17,12 @@ export default function StartGameModal({
   onClose,
   onStartGame,
 }: StartGameModalProps) {
-  const [playerName, setPlayerName] = useState("");
-  const [difficulty, setDifficulty] = useState("medium");
-  const [category, setCategory] = useState("any");
+  const playerName = useGameStore((state) => state.config.playerName);
+  const difficulty = useGameStore((state) => state.config.difficulty);
+  const category = useGameStore((state) => state.config.category);
+  const setPlayerName = useGameStore((state) => state.setPlayerName);
+  const setDifficulty = useGameStore((state) => state.setDifficulty);
+  const setCategory = useGameStore((state) => state.setCategory);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,7 +75,7 @@ export default function StartGameModal({
               type="text"
               id="playerName"
               value={playerName}
-              onChange={(e) => setPlayerName(e.target.value)}
+              onChange={(e) => setPlayerName({ playerName: e.target.value })}
               placeholder="Enter your name"
               className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
             />
@@ -93,7 +96,14 @@ export default function StartGameModal({
                     name="difficulty"
                     value={diff.value}
                     checked={difficulty === diff.value}
-                    onChange={(e) => setDifficulty(e.target.value)}
+                    onChange={(e) =>
+                      setDifficulty({
+                        difficulty: e.target.value as
+                          | "easy"
+                          | "medium"
+                          | "hard",
+                      })
+                    }
                     className="w-4 h-4 text-blue-600 focus:ring-blue-500"
                   />
                   <div className="ml-3">
@@ -119,7 +129,7 @@ export default function StartGameModal({
             <select
               id="category"
               value={category}
-              onChange={(e) => setCategory(e.target.value)}
+              onChange={(e) => setCategory({ category: e.target.value })}
               className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
             >
               {categories.map((cat) => (

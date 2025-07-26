@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import EnhancedGameQuestion from "@/components/EnhancedGameQuestion";
 import { LiveScoreboard } from "@/components";
 import { useCreateGameSession } from "@/lib/query/gameSessionQuery";
-import { useGameState, useGameStats } from "@/lib/stores/gameStore/gameStore";
+import { useGameState, useGameStats, useGameConfig, useGameStore } from "@/lib/stores/gameStore/gameStore";
 import { useGameFlow } from "@/lib/stores/gameFlow/gameFlow";
 
 export default function EnhancedGamePage() {
@@ -17,6 +17,10 @@ export default function EnhancedGamePage() {
   const createGameSession = useCreateGameSession();
   const gameState = useGameState();
   const gameStats = useGameStats();
+  const gameConfig = useGameConfig();
+  const storePlayerId = useGameStore((state) => state.playerId);
+  const updateConfig = useGameStore((state) => state.updateConfig);
+  const initializeGame = useGameStore((state) => state.initializeGame);
   const gameFlow = useGameFlow();
 
   // Check for existing session in localStorage on mount
@@ -37,15 +41,18 @@ export default function EnhancedGamePage() {
 
   const startNewGame = async () => {
     try {
-      const newPlayerId = `player-${Date.now()}`;
+      const playerId = storePlayerId || `player-${Date.now()}`;
       const result = await createGameSession.mutateAsync({
-        playerId: newPlayerId,
-        difficulty: "medium",
-        category: "any",
+        playerId: playerId,
+        difficulty: gameConfig.difficulty,
+        category: gameConfig.category,
       });
 
+      // Initialize the Zustand store with the session and current config
+      initializeGame(result.session.id, playerId, gameConfig);
+
       setSessionId(result.session.id);
-      setPlayerId(newPlayerId);
+      setPlayerId(playerId);
       setIsInitialized(true);
 
       // Store session data
@@ -53,7 +60,7 @@ export default function EnhancedGamePage() {
         "gameSession",
         JSON.stringify({
           id: result.session.id,
-          playerId: newPlayerId,
+          playerId: playerId,
         })
       );
     } catch (error) {
@@ -127,6 +134,60 @@ export default function EnhancedGamePage() {
                 <div className="flex items-center justify-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
                   <span>🏆</span>
                   <span>Achievement system</span>
+                </div>
+              </div>
+
+              {/* Game Configuration */}
+              <div className="space-y-6 mb-8">
+                {/* Difficulty Selection */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                    Select Difficulty
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {(["easy", "medium", "hard"] as const).map((level) => (
+                      <button
+                        key={level}
+                        onClick={() => updateConfig({ difficulty: level })}
+                        className={`py-2 px-3 rounded-lg text-sm font-medium transition-all duration-200 ${
+                          gameConfig.difficulty === level
+                            ? "bg-blue-600 text-white shadow-md"
+                            : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                        }`}
+                      >
+                        {level.charAt(0).toUpperCase() + level.slice(1)}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Category Selection */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                    Select Category
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      { value: "any", label: "Any Category" },
+                      { value: "science", label: "Science" },
+                      { value: "history", label: "History" },
+                      { value: "sports", label: "Sports" },
+                      { value: "geography", label: "Geography" },
+                      { value: "entertainment", label: "Entertainment" },
+                    ].map((category) => (
+                      <button
+                        key={category.value}
+                        onClick={() => updateConfig({ category: category.value })}
+                        className={`py-2 px-3 rounded-lg text-sm font-medium transition-all duration-200 ${
+                          gameConfig.category === category.value
+                            ? "bg-green-600 text-white shadow-md"
+                            : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                        }`}
+                      >
+                        {category.label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
 

@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { GameQuestion, LiveScoreboard } from "@/components";
 import { useCreateGameSession } from "@/lib/query/gameSessionQuery";
+import { useGameConfig, useGameStore } from "@/lib/stores/gameStore/gameStore";
 import GameInstructions from "@/components/GameInstructions/GameInstructions";
 import GameStatsCard from "@/components/GameStatsCard/GameStatsCard";
 import GameControlsHeader from "@/components/GameControlsHeader/GameControlsHeader";
@@ -15,6 +16,10 @@ export default function GamePage() {
 
   const router = useRouter();
   const createGameSession = useCreateGameSession();
+  const gameConfig = useGameConfig();
+  const storePlayerId = useGameStore((state) => state.playerId);
+  const updateConfig = useGameStore((state) => state.updateConfig);
+  const initializeGame = useGameStore((state) => state.initializeGame);
 
   // Check for existing session in localStorage on mount
   useEffect(() => {
@@ -33,11 +38,15 @@ export default function GamePage() {
 
   const startNewGame = useCallback(async () => {
     try {
+      const playerId = storePlayerId || `player-${Date.now()}`;
       const result = await createGameSession.mutateAsync({
-        playerId: `player-${Date.now()}`,
-        difficulty: "medium",
-        category: "any",
+        playerId: playerId,
+        difficulty: gameConfig.difficulty,
+        category: gameConfig.category,
       });
+
+      // Initialize the Zustand store with the session and current config
+      initializeGame(result.session.id, playerId, gameConfig);
 
       setSessionId(result.session.id);
       setGameStarted(true);
@@ -45,7 +54,7 @@ export default function GamePage() {
       console.error("Error starting game:", error);
       alert("Failed to start game. Please try again.");
     }
-  }, [createGameSession]);
+  }, [createGameSession, storePlayerId, gameConfig, initializeGame]);
 
   const handleScoreUpdate = (newScore: number, isCorrect: boolean) => {
     // Score updates are handled by the LiveScoreboard component automatically
@@ -67,6 +76,8 @@ export default function GamePage() {
       <GameStartNewGame
         startNewGame={startNewGame}
         createGameSession={createGameSession}
+        gameConfig={gameConfig}
+        onConfigChange={updateConfig}
       />
     );
   }
@@ -88,8 +99,8 @@ export default function GamePage() {
           <div className="w-full">
             <GameQuestion
               sessionId={sessionId}
-              category="any"
-              difficulty="medium"
+              category={gameConfig.category}
+              difficulty={gameConfig.difficulty}
               onScoreUpdate={handleScoreUpdate}
               onQuestionComplete={handleQuestionComplete}
             />

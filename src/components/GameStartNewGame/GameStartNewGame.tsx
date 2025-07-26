@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { useRouter } from "next/navigation";
+import { GameConfig } from "@/lib/stores/gameStore/gameStore";
 
 type CreateGameSession = {
   isPending: boolean;
@@ -9,11 +10,15 @@ type CreateGameSession = {
 type GameStartNewGameProps = {
   startNewGame: () => void;
   createGameSession: CreateGameSession;
+  gameConfig: GameConfig;
+  onConfigChange: (config: Partial<GameConfig>) => void;
 };
 
 const GameStartNewGame: React.FC<GameStartNewGameProps> = ({
   startNewGame,
   createGameSession,
+  gameConfig,
+  onConfigChange,
 }) => {
   const router = useRouter();
 
@@ -33,6 +38,60 @@ const GameStartNewGame: React.FC<GameStartNewGameProps> = ({
               Test your knowledge with AI-generated questions and watch your
               score update in real-time!
             </p>
+
+            {/* Game Configuration */}
+            <div className="space-y-6 mb-8">
+              {/* Difficulty Selection */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                  Select Difficulty
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  {(["easy", "medium", "hard"] as const).map((level) => (
+                    <button
+                      key={level}
+                      onClick={() => onConfigChange({ difficulty: level })}
+                      className={`py-2 px-3 rounded-lg text-sm font-medium transition-all duration-200 ${
+                        gameConfig.difficulty === level
+                          ? "bg-blue-600 text-white shadow-md"
+                          : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                      }`}
+                    >
+                      {level.charAt(0).toUpperCase() + level.slice(1)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Category Selection */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                  Select Category
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { value: "any", label: "Any Category" },
+                    { value: "science", label: "Science" },
+                    { value: "history", label: "History" },
+                    { value: "sports", label: "Sports" },
+                    { value: "geography", label: "Geography" },
+                    { value: "entertainment", label: "Entertainment" },
+                  ].map((category) => (
+                    <button
+                      key={category.value}
+                      onClick={() => onConfigChange({ category: category.value })}
+                      className={`py-2 px-3 rounded-lg text-sm font-medium transition-all duration-200 ${
+                        gameConfig.category === category.value
+                          ? "bg-green-600 text-white shadow-md"
+                          : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                      }`}
+                    >
+                      {category.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
 
             <button
               onClick={startNewGame}

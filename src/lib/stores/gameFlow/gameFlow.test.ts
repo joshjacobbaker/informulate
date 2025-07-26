@@ -43,10 +43,12 @@ describe('Game Flow Integration', () => {
     });
     
     mockSubmitAnswer.mockResolvedValue({
-      isCorrect: true,
-      correctAnswer: 'B',
-      pointsEarned: 10,
-      explanation: 'Basic addition: 2 + 2 = 4',
+      result: {
+        isCorrect: true,
+        correctAnswer: 'B',
+        pointsEarned: 10,
+        explanation: 'Basic addition: 2 + 2 = 4',
+      },
       newScore: 10,
       streak: 1,
       timestamp: new Date().toISOString(),

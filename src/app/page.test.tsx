@@ -173,6 +173,11 @@ describe("Home page", () => {
 
     renderWithQuery(<Home />);
     fireEvent.click(screen.getByText(/Start Playing Now/i));
+    
+    // Clear the player name input to make it empty
+    const nameInput = screen.getByPlaceholderText(/Enter your name/i);
+    fireEvent.change(nameInput, { target: { value: '' } });
+    
     fireEvent.click(screen.getByText(/Start Game/i));
 
     await waitFor(() => {
